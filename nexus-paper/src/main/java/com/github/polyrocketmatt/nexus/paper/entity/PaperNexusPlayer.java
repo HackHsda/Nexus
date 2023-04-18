@@ -16,6 +16,8 @@ public class PaperNexusPlayer implements NexusPlayer {
     public PaperNexusPlayer(Player player) {
         this.player = player;
         this.uuid = player.getUniqueId();
+
+        //  Schedule a task to check the latest player data from the database (or create a new one if it doesn't exist)
     }
 
     @Override

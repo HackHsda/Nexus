@@ -7,6 +7,7 @@ import com.github.polyrocketmatt.nexus.common.manager.EventManager;
 import com.github.polyrocketmatt.nexus.common.manager.MetricsManager;
 import com.github.polyrocketmatt.nexus.common.manager.ModuleManager;
 import com.github.polyrocketmatt.nexus.common.manager.PlayerManager;
+import com.github.polyrocketmatt.nexus.common.manager.TaskManager;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import com.github.polyrocketmatt.nexus.common.utils.ResourceLoader;
 
@@ -27,6 +28,7 @@ public class Nexus {
     private MetricsManager metricsManager;
     private ModuleManager moduleManager;
     private PlayerManager playerManager;
+    private TaskManager taskManager;
     private NexusClient client;
 
     private Nexus() {
@@ -37,6 +39,7 @@ public class Nexus {
         this.metricsManager = null;
         this.moduleManager = null;
         this.playerManager = null;
+        this.taskManager = null;
         this.client = null;
     }
 
@@ -55,6 +58,7 @@ public class Nexus {
         INSTANCE.eventManager = new EventManager();
         INSTANCE.moduleManager = new ModuleManager();
         INSTANCE.playerManager = new PlayerManager();
+        INSTANCE.taskManager = new TaskManager();
         INSTANCE.client = new NexusClient();
 
         NexusLogger.inform("Nexus loaded successfully for platform: %s", NexusLogger.LogType.COMMON, platform.getPlatformType().name());
@@ -90,6 +94,12 @@ public class Nexus {
         return INSTANCE.eventManager;
     }
 
+    public MetricsManager getMetricsManager() {
+        if (INSTANCE.metricsManager == null)
+            throw new NexusInitException("Nexus has not been initialised yet!");
+        return INSTANCE.metricsManager;
+    }
+
     public static ModuleManager getModuleManager() {
         if (INSTANCE.moduleManager == null)
             throw new NexusInitException("Nexus has not been initialised yet!");
@@ -100,6 +110,12 @@ public class Nexus {
         if (INSTANCE.playerManager == null)
             throw new NexusInitException("Nexus has not been initialised yet!");
         return INSTANCE.playerManager;
+    }
+
+    public TaskManager getTaskManager() {
+        if (INSTANCE.taskManager == null)
+            throw new NexusInitException("Nexus has not been initialised yet!");
+        return INSTANCE.taskManager;
     }
 
     public NexusClient getClient() {

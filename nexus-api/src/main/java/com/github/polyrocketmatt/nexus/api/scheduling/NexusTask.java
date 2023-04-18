@@ -1,4 +1,11 @@
 package com.github.polyrocketmatt.nexus.api.scheduling;
 
-public class NexusTask {
+import io.netty.util.TimerTask;
+
+import java.util.UUID;
+
+public interface NexusTask extends TimerTask {
+
+    UUID getTaskId();
+
 }
