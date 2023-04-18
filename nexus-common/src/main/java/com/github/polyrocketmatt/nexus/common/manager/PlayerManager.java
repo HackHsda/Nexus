@@ -1,6 +1,7 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
 import com.github.polyrocketmatt.nexus.api.entity.NexusPlayer;
+import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,12 +10,20 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class PlayerManager {
+public class PlayerManager implements NexusManager {
 
     private final Set<NexusPlayer> players;
 
     public PlayerManager() {
         this.players = new HashSet<>();
+    }
+
+    @Override
+    public void close() {
+        //  TODO: Perform Database Update!
+        this.players.clear();
+
+        NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
     public void registerPlayer(@NotNull NexusPlayer player) {

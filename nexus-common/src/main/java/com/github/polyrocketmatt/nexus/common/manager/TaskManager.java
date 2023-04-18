@@ -1,6 +1,8 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
+import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
 import com.github.polyrocketmatt.nexus.api.scheduling.NexusTask;
+import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -9,12 +11,21 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
-public class TaskManager extends Thread {
+public class TaskManager extends Thread implements NexusManager {
 
     private final Map<NexusTask, Timer> taskSet;
 
     public TaskManager() {
         this.taskSet = new HashMap<>();
+    }
+
+    @Override
+    public void close() {
+        cancelAll();
+        taskSet.clear();
+
+        NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
+        NexusLogger.inform("   Closed Tasks: %s", NexusLogger.LogType.COMMON, taskSet.size());
     }
 
     public void addTask(NexusTask task, long delay, long period) {

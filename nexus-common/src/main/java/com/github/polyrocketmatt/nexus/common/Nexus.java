@@ -7,6 +7,7 @@ import com.github.polyrocketmatt.nexus.common.manager.MetricsManager;
 import com.github.polyrocketmatt.nexus.common.manager.ModuleManager;
 import com.github.polyrocketmatt.nexus.common.manager.PlayerManager;
 import com.github.polyrocketmatt.nexus.common.manager.TaskManager;
+import com.github.polyrocketmatt.nexus.common.manager.ThreadManager;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import com.github.polyrocketmatt.nexus.common.utils.ResourceLoader;
 
@@ -27,6 +28,7 @@ public class Nexus {
     private MetricsManager metricsManager;
     private ModuleManager moduleManager;
     private PlayerManager playerManager;
+    private ThreadManager threadManager;
     private TaskManager taskManager;
 
     private Nexus() {
@@ -55,6 +57,7 @@ public class Nexus {
         INSTANCE.eventManager = new EventManager();
         INSTANCE.moduleManager = new ModuleManager();
         INSTANCE.playerManager = new PlayerManager();
+        INSTANCE.threadManager = new ThreadManager();
         INSTANCE.taskManager = new TaskManager();
 
         NexusLogger.inform("Nexus loaded successfully for platform: %s", NexusLogger.LogType.COMMON, platform.getPlatformType().name());
@@ -108,7 +111,13 @@ public class Nexus {
         return INSTANCE.playerManager;
     }
 
-    public TaskManager getTaskManager() {
+    public static ThreadManager getThreadManager() {
+        if (INSTANCE.threadManager == null)
+            throw new NexusInitException("Nexus has not been initialised yet!");
+        return INSTANCE.threadManager;
+    }
+
+    public static TaskManager getTaskManager() {
         if (INSTANCE.taskManager == null)
             throw new NexusInitException("Nexus has not been initialised yet!");
         return INSTANCE.taskManager;

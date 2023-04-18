@@ -1,6 +1,8 @@
 package com.github.polyrocketmatt.nexus.paper.entity;
 
 import com.github.polyrocketmatt.nexus.api.entity.NexusPlayer;
+import com.github.polyrocketmatt.nexus.api.entity.NexusPlayerData;
+import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.paper.PaperNexus;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -18,6 +20,12 @@ public class PaperNexusPlayer implements NexusPlayer {
         this.uuid = player.getUniqueId();
 
         //  Schedule a task to check the latest player data from the database (or create a new one if it doesn't exist)
+        Nexus.getThreadManager().<NexusPlayerData>accept(
+                () -> {
+
+                },
+                () -> {}
+        );
     }
 
     @Override

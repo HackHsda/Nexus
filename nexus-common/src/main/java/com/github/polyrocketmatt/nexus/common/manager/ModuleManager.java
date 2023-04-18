@@ -1,5 +1,6 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
+import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
 import com.github.polyrocketmatt.nexus.api.module.NexusModule;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.exception.NexusModuleException;
@@ -9,12 +10,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ModuleManager {
+public class ModuleManager implements NexusManager {
 
     private final Set<NexusModule> modules;
 
     public ModuleManager() {
         this.modules = new HashSet<>();
+    }
+
+    @Override
+    public void close() {
+        this.modules.clear();
+
+        NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
     public void registerModule(NexusModule module) {
