@@ -32,6 +32,19 @@ methods to detect cheats. This allows Nexus to be more accurate and more efficie
 other solutions. The different built-in operating modes allow server admins to choose
 how Nexus should operate, allowing for more optimized performance when needed.
 
+## Open Source
+
+Nexus is open source, meaning that anyone can view the source code and contribute to the
+project. This allows for more transparency and allows the community to help improve the
+project. The following is a list of items that are currently not open source:
+
+- Machine Learning Models
+- Configuration Files
+- Database Files
+
+This is to ensure the integrity of the models and the security of the configuration. It 
+also prevents from blatant stealing of the models and configuration files.
+
 ---
 
 <h5 align="center">Icons provided by <a href="https://www.flaticon.com/">Flaticon</a></h5>
