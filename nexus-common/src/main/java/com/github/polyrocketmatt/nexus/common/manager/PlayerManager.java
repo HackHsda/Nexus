@@ -1,7 +1,7 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
-import com.github.polyrocketmatt.nexus.api.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
+import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

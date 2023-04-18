@@ -2,12 +2,12 @@ package com.github.polyrocketmatt.nexus.paper;
 
 import com.github.polyrocketmatt.nexus.api.NexusPlatform;
 import com.github.polyrocketmatt.nexus.api.PlatformType;
-import com.github.polyrocketmatt.nexus.api.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.api.events.NexusListener;
 import com.github.polyrocketmatt.nexus.api.metrics.NexusMetrics;
 import com.github.polyrocketmatt.nexus.api.module.NexusModule;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.Nexus;
+import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.common.exception.NexusEntityException;
 import com.github.polyrocketmatt.nexus.common.exception.NexusException;
 import com.github.polyrocketmatt.nexus.common.exception.NexusModuleException;

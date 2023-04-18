@@ -1,6 +1,6 @@
 package com.github.polyrocketmatt.nexus.common.client;
 
-import com.github.polyrocketmatt.nexus.api.entity.NexusPlayer;
+import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.common.exception.NexusClientException;
 import com.google.gson.Gson;
 import org.jetbrains.annotations.NotNull;

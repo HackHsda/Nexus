@@ -1,4 +1,4 @@
-package com.github.polyrocketmatt.nexus.api.entity;
+package com.github.polyrocketmatt.nexus.common.entity;
 
 import java.util.UUID;
 

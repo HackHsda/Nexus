@@ -1,6 +1,6 @@
 package com.github.polyrocketmatt.nexus.api;
 
-import com.github.polyrocketmatt.nexus.api.entity.NexusPlayer;
+import com.github.polyrocketmatt.nexus.api.entity.NexusEntity;
 import com.github.polyrocketmatt.nexus.api.events.NexusListener;
 import com.github.polyrocketmatt.nexus.api.metrics.NexusMetrics;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
@@ -22,7 +22,7 @@ public interface NexusPlatform {
 
     @NotNull <T extends NexusModule> T getModule(@NotNull NexusModuleType type);
 
-    @NotNull NexusPlayer getPlayer(@NotNull UUID uuid);
+    @NotNull NexusEntity getPlayer(@NotNull UUID uuid);
 
     void registerPlayer(@NotNull UUID uuid);
 

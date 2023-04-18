@@ -32,7 +32,9 @@ public class ThreadManager extends Thread implements NexusManager {
     }
 
     public <T> void accept(Supplier<T> supplier, Consumer<T> consumer) {
-        CompletableFuture.supplyAsync(supplier).thenAccept(consumer);
+        CompletableFuture
+                .supplyAsync(supplier, executorService)
+                .thenAccept(consumer);
     }
 
 }
