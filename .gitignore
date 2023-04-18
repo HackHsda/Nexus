@@ -1,0 +1,27 @@
+# Target folders
+/nexus-api/target/
+/nexus-bungee/target/
+/nexus-common/target/
+/nexus-paper/target/
+/nexus-spigot/target/
+/nexus-sponge/target/
+/nexus-velocity/target/
+
+# Dependency reduced POMs
+/nexus-api/depedency-reduced-pom.xml
+/nexus-bungee/depedency-reduced-pom.xml
+/nexus-common/depedency-reduced-pom.xml
+/nexus-paper/depedency-reduced-pom.xml
+/nexus-spigot/depedency-reduced-pom.xml
+/nexus-sponge/depedency-reduced-pom.xml
+/nexus-velocity/depedency-reduced-pom.xml
+
+/src/
+/.idea/
+/build/
+
+# Property files
+*.properties
+
+# YAML files
+*.yml
