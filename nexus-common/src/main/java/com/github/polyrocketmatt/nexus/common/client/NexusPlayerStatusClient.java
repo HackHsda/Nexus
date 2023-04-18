@@ -2,6 +2,7 @@ package com.github.polyrocketmatt.nexus.common.client;
 
 import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.common.exception.NexusClientException;
+import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import com.google.gson.Gson;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +25,8 @@ public class NexusPlayerStatusClient extends NexusClient {
         try {
             HttpRequest request = construct(Method.GET, player.getUniqueId(), "");
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            NexusLogger.inform("Sending GET request to %s", NexusLogger.LogType.COMMON,  request.uri().toString());
+            NexusLogger.inform("Response: %s", NexusLogger.LogType.COMMON, response.body());
 
             return gson.fromJson(response.body(), clazz);
         } catch (IOException ex) {

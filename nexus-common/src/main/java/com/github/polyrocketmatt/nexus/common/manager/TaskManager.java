@@ -25,7 +25,7 @@ public class TaskManager extends Thread implements NexusManager {
         taskSet.clear();
 
         NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
-        NexusLogger.inform("   Closed Tasks: %s", NexusLogger.LogType.COMMON, taskSet.size());
+        NexusLogger.inform("    Closed Tasks: %s", NexusLogger.LogType.COMMON, taskSet.size());
     }
 
     public void addTask(NexusTask task, long delay, long period) {

@@ -86,6 +86,7 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
     @Override
     public void onDisable() {
         NexusLogger.inform("Disabling Nexus: Paper", NexusLogger.LogType.PLATFORM);
+        Nexus.unload();
         NexusLogger.shutdown();
     }
 

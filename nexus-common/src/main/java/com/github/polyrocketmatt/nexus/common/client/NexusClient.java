@@ -9,7 +9,9 @@ import org.jetbrains.annotations.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
+import java.time.Duration;
 import java.util.UUID;
 
 public abstract class NexusClient {
@@ -35,15 +37,15 @@ public abstract class NexusClient {
     protected @NotNull HttpRequest construct(@NotNull Method method, @NotNull UUID uuid, @Nullable String body) {
         try {
             HttpRequest.Builder builder = HttpRequest.newBuilder()
-                    .uri(new URI(url))
                     .header("Content-Type", "application/json")
-                    .header("Authorization", uuid.toString());
+                    .header("Authorization", uuid.toString())
+                    .timeout(Duration.ofSeconds(30));
 
             switch (method) {
-                case GET        -> builder.GET();
-                case POST       -> builder.POST(bodyPublisher(body));
-                case PUT        -> builder.PUT(bodyPublisher(body));
-                case DELETE     -> builder.DELETE();
+                case GET        -> builder.GET().uri(new URI("%s/%s".formatted(url, "get/")));
+                case POST       -> builder.POST(bodyPublisher(body)).uri(new URI("%s/%s".formatted(url, "post/")));
+                case PUT        -> builder.PUT(bodyPublisher(body)).uri(new URI("%s/%s".formatted(url, "put/")));
+                case DELETE     -> builder.DELETE().uri(new URI("%s/%s".formatted(url, "delete/")));
             }
 
             return builder.build();

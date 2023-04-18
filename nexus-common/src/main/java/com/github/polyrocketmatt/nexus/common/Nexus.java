@@ -71,6 +71,17 @@ public class Nexus {
         }
     }
 
+    public static void unload() {
+        NexusLogger.inform("Unloading Nexus...", NexusLogger.LogType.COMMON);
+        if (INSTANCE.eventManager != null)      INSTANCE.eventManager.close();
+        if (INSTANCE.metricsManager != null)    INSTANCE.metricsManager.close();
+        if (INSTANCE.moduleManager != null)     INSTANCE.moduleManager.close();
+        if (INSTANCE.playerManager != null)     INSTANCE.playerManager.close();
+        if (INSTANCE.threadManager != null)     INSTANCE.threadManager.close();
+        if (INSTANCE.taskManager != null)       INSTANCE.taskManager.close();
+        NexusLogger.inform("Nexus unloaded successfully", NexusLogger.LogType.COMMON);
+    }
+
     public static void postLoad() {
         INSTANCE.metricsManager = new MetricsManager(INSTANCE.platform.getConfiguration().getBoolean("metrics"));
     }
