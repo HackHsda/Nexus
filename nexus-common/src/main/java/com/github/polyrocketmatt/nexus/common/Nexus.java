@@ -1,7 +1,6 @@
 package com.github.polyrocketmatt.nexus.common;
 
 import com.github.polyrocketmatt.nexus.api.NexusPlatform;
-import com.github.polyrocketmatt.nexus.common.client.NexusClient;
 import com.github.polyrocketmatt.nexus.common.exception.NexusInitException;
 import com.github.polyrocketmatt.nexus.common.manager.EventManager;
 import com.github.polyrocketmatt.nexus.common.manager.MetricsManager;
@@ -29,7 +28,6 @@ public class Nexus {
     private ModuleManager moduleManager;
     private PlayerManager playerManager;
     private TaskManager taskManager;
-    private NexusClient client;
 
     private Nexus() {
         this.platform = null;
@@ -40,7 +38,6 @@ public class Nexus {
         this.moduleManager = null;
         this.playerManager = null;
         this.taskManager = null;
-        this.client = null;
     }
 
     public static void loadNexus(NexusPlatform platform, File workingDirectory) {
@@ -59,7 +56,6 @@ public class Nexus {
         INSTANCE.moduleManager = new ModuleManager();
         INSTANCE.playerManager = new PlayerManager();
         INSTANCE.taskManager = new TaskManager();
-        INSTANCE.client = new NexusClient();
 
         NexusLogger.inform("Nexus loaded successfully for platform: %s", NexusLogger.LogType.COMMON, platform.getPlatformType().name());
     }
@@ -116,9 +112,5 @@ public class Nexus {
         if (INSTANCE.taskManager == null)
             throw new NexusInitException("Nexus has not been initialised yet!");
         return INSTANCE.taskManager;
-    }
-
-    public NexusClient getClient() {
-        return client;
     }
 }
