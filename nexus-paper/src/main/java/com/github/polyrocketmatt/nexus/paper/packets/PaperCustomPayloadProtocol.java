@@ -34,7 +34,7 @@ public class PaperCustomPayloadProtocol extends PaperProtocol implements ModuleH
         super(PacketType.Play.Client.CUSTOM_PAYLOAD);
 
         //  Register as a handler for the client detection module
-
+        Nexus.getModuleManager().registerModuleHandler(NexusModuleType.CLIENT_DETECTION, this);
 
         this.adapter = new PacketAdapter(
                 PaperNexus.getInstance(),

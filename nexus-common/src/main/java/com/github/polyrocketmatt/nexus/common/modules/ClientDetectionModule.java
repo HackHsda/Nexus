@@ -1,7 +1,5 @@
 package com.github.polyrocketmatt.nexus.common.modules;
 
-import com.github.polyrocketmatt.nexus.api.PlatformType;
-import com.github.polyrocketmatt.nexus.api.module.ModuleHandler;
 import com.github.polyrocketmatt.nexus.api.module.NexusModule;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.Nexus;
@@ -10,31 +8,27 @@ import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import com.github.polyrocketmatt.nexus.common.utils.Pair;
 import com.github.polyrocketmatt.nexus.common.utils.processor.StringProcessor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
-public class ClientDetectionModule implements NexusModule {
+public class ClientDetectionModule extends NexusModule {
 
     private static final String CONNECTION_KEY_ROUTE = "modules.client-detection.keys";
     private static final String CONNECTION_KEY_PROP_ROUTE = "client-detection.key";
     private final Map<String, Pair<String, String>> connectionKeys;
     private final Map<String, Integer> mods;
-    private final Set<ModuleHandler> handlers;
 
     @SuppressWarnings({"ResultOfMethodCallIgnored"})
     public ClientDetectionModule() {
         this.connectionKeys = new HashMap<>();
         this.mods = new HashMap<>();
-        this.handlers = new HashSet<>();
 
         //  Get all the connection keys from the configuration
         Set<String> keys = Nexus.getPlatform().getConfiguration().getSection(CONNECTION_KEY_ROUTE).getKeys()
@@ -156,16 +150,6 @@ public class ClientDetectionModule implements NexusModule {
 
     public @NotNull Set<String> parseForgeMods(String message) {
         return StringProcessor.getProcessor().contains(message, mods.keySet(), ':', 10000);
-    }
-
-    @Override
-    public @Nullable ModuleHandler getModuleHandler(PlatformType type) {
-        for (ModuleHandler handler : handlers) {
-            if (handler.getPlatformType() == type)
-                return handler;
-        }
-
-        return null;
     }
 
     @Override

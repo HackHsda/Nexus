@@ -1,6 +1,7 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
+import com.github.polyrocketmatt.nexus.api.module.ModuleHandler;
 import com.github.polyrocketmatt.nexus.api.module.NexusModule;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.exception.NexusModuleException;
@@ -31,6 +32,15 @@ public class ModuleManager implements NexusManager {
         this.modules.add(module);
 
         NexusLogger.inform("Registered module: %s".formatted(module.getModuleType().name()), NexusLogger.LogType.COMMON);
+    }
+
+    public void registerModuleHandler(NexusModuleType type, ModuleHandler handler) {
+        if (!isEnabled(type))
+            throw new NexusModuleException("Module %s is not enabled".formatted(type.name()), type);
+        NexusModule module = getModule(type);
+        if (module == null)
+            throw new NexusModuleException("Module %s is not enabled".formatted(type.name()), type);
+        module.addModuleHandler(handler);
     }
 
     public void unregisterModule(NexusModule module) {
