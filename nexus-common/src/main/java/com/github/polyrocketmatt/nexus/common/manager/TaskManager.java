@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 public class TaskManager extends Thread implements NexusManager {
@@ -21,17 +20,11 @@ public class TaskManager extends Thread implements NexusManager {
 
     @Override
     public void close() {
-        cancelAll();
+        cancelAllTasks();
         taskSet.clear();
 
         NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
         NexusLogger.inform("    Closed Tasks: %s", NexusLogger.LogType.COMMON, taskSet.size());
-    }
-
-    public void addTask(NexusTask task, long delay, long period) {
-        Timer taskTimer = new Timer();
-        taskTimer.schedule(task, delay, period);
-        taskSet.put(task, taskTimer);
     }
 
     public void removeTask(UUID uuid) {
@@ -55,18 +48,30 @@ public class TaskManager extends Thread implements NexusManager {
                 .orElse(null);
     }
 
-    public void cancel(UUID uuid) {
-        taskSet.entrySet()
-                .stream()
-                .filter(entry -> entry.getKey().getTaskId().equals(uuid))
-                .findFirst()
-                .ifPresent(entry -> {
-                    entry.getValue().cancel();
-                    taskSet.remove(entry.getKey());
-                });
+    public void scheduleTask(NexusTask task) {
+        long delay = task.getDelay();
+        long period = task.getPeriod();
+
+        Timer taskTimer = new Timer();
+        taskTimer.schedule(task, delay, period);
+        taskSet.put(task, taskTimer);
     }
 
-    public void cancelAll() {
+    public void rescheduleTask(UUID uuid) {
+        NexusTask task = getTask(uuid);
+        if (task == null)
+            return;
+        scheduleTask(task);
+    }
+
+    public void cancelTask(UUID uuid) {
+        Timer timer = getTaskTimer(uuid);
+        if (timer == null)
+            return;
+        timer.cancel();
+    }
+
+    public void cancelAllTasks() {
         taskSet.forEach((task, timer) -> timer.cancel());
     }
 

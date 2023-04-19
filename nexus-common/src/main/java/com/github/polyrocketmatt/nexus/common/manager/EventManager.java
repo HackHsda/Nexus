@@ -3,6 +3,8 @@ package com.github.polyrocketmatt.nexus.common.manager;
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
 import com.github.polyrocketmatt.nexus.api.events.NexusListener;
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
+import com.github.polyrocketmatt.nexus.api.scheduling.NexusTask;
+import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.exception.NexusEntityException;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import org.jetbrains.annotations.NotNull;
@@ -55,6 +57,9 @@ public class EventManager implements NexusManager {
         if (!eventBox.containsKey(uuid))
             throw new NexusEntityException("Player with UUID: %s does not exist!".formatted(uuid));
         eventBox.get(uuid).add(event);
+
+        //  Reschedule processing task
+        Nexus.getTaskManager().rescheduleTask(uuid);
 
         NexusLogger.inform("Enqueued event: %s for UUID %s", NexusLogger.LogType.COMMON, event.getClass().getSimpleName(), uuid.toString());
         NexusLogger.inform("    Event Handle: %s", NexusLogger.LogType.COMMON, event.getModuleHandle());
