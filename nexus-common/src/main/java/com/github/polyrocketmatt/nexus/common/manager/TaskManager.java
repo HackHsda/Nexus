@@ -30,7 +30,7 @@ public class TaskManager extends Thread implements NexusManager {
 
     public void addTask(NexusTask task, long delay, long period) {
         Timer taskTimer = new Timer();
-        taskTimer.schedule((TimerTask) task, delay, period);
+        taskTimer.schedule(task, delay, period);
         taskSet.put(task, taskTimer);
     }
 

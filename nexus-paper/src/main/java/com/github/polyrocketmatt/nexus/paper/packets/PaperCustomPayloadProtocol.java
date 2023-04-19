@@ -49,7 +49,7 @@ public class PaperCustomPayloadProtocol extends PaperProtocol implements ModuleH
                 if (player != null)
                     process(nexusEvent, player);
                 else
-                    Nexus.getPlayerManager().message(event.getPlayer().getUniqueId(), nexusEvent);
+                    Nexus.getEventManager().enqueue(event.getPlayer().getUniqueId(), nexusEvent);
             }
         };
     }
