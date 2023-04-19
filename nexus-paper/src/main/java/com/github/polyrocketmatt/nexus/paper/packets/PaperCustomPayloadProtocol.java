@@ -22,8 +22,7 @@ public class PaperCustomPayloadProtocol extends PaperProtocol {
     private final PacketAdapter adapter;
     private final String clientDetectedMessage = PaperNexus.getInstance().getConfiguration().getString("messages.client-detected");
     private final String modDetectedMessage = PaperNexus.getInstance().getConfiguration().getString("messages.mod-detected");
-    private final boolean checkForge = PaperNexus.getInstance().getConfiguration().getBoolean("modules.client-detection.options.check-forge-mods");
-    private final boolean checkFabric = PaperNexus.getInstance().getConfiguration().getBoolean("modules.client-detection.options.check-fabric-mods");
+    private final boolean checkMods = PaperNexus.getInstance().getConfiguration().getBoolean("modules.client-detection.mod-options.check-mods");
 
     public PaperCustomPayloadProtocol() {
         super(PacketType.Play.Client.CUSTOM_PAYLOAD);
@@ -52,22 +51,16 @@ public class PaperCustomPayloadProtocol extends PaperProtocol {
                     player.sendMessage(clientDetectedMessage.formatted(detectionResult.getSecond()));
 
                 //  Handle forge detection
-                if (checkForge)
-                    handleForgeDetection(player, message);
-                else if (checkFabric)
-                    handleFabricDetection(player, message);
+                if (checkMods)
+                    handleMods(player, message);
             }
         };
     }
 
-    private void handleForgeDetection(NexusPlayer player, String message) {
+    private void handleMods(NexusPlayer player, String message) {
         Set<String> mods = PaperNexus.getInstance().<ClientDetectionModule>getModule(NexusModuleType.CLIENT_DETECTION).parseForgeMods(message);
 
         mods.forEach(mod -> player.sendMessage(modDetectedMessage.formatted(mod)));
-    }
-
-    private void handleFabricDetection(NexusPlayer player, String message) {
-
     }
 
     @Override

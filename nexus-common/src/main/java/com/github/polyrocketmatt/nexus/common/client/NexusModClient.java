@@ -1,6 +1,5 @@
 package com.github.polyrocketmatt.nexus.common.client;
 
-import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.common.exception.NexusClientException;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import com.google.gson.Gson;
@@ -12,11 +11,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
 
-public class NexusForgeClient extends NexusClient {
+public class NexusModClient extends NexusClient {
 
     private final Gson gson = new Gson();
 
-    public NexusForgeClient() {
+    public NexusModClient() {
     }
 
     @Override

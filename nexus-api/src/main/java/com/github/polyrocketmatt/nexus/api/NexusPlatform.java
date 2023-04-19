@@ -8,9 +8,14 @@ import com.github.polyrocketmatt.nexus.api.module.NexusModule;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.UUID;
 
 public interface NexusPlatform {
+
+    @NotNull File getLoggingDirectory();
+
+    @NotNull File getDataDirectory();
 
     @NotNull String getPrefix();
 

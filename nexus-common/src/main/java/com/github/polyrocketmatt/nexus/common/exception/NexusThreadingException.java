@@ -3,13 +3,15 @@ package com.github.polyrocketmatt.nexus.common.exception;
 import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 
-public class NexusInitException extends NexusException {
+import java.util.Arrays;
 
-    public NexusInitException(String message) {
+public class NexusThreadingException extends NexusException {
+
+    public NexusThreadingException(String message, String... data) {
         super(message);
 
         if (!Nexus.getPlatform().getConfiguration().getBoolean("logging.suppress")) {
-            NexusLogger.error("    Type: NexusInitException", NexusLogger.LogType.COMMON);
+            Arrays.stream(data).forEach(str -> NexusLogger.error("    Error: %s", NexusLogger.LogType.COMMON, str));
         }
     }
 }

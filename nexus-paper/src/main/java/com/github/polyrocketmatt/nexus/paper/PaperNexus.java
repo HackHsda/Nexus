@@ -35,6 +35,7 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
     private static PaperNexus instance;
 
     private final File LOGGING_DIR = new File(getDataFolder(), "logging");
+    private final File DATA_DIR = new File(getDataFolder(), "data");
     private YamlDocument configuration;
     private PaperPacketProtocol protocol;
 
@@ -50,6 +51,7 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
         boolean install = !getDataFolder().exists();
         if (!getDataFolder().exists())  getDataFolder().mkdir();
         if (!LOGGING_DIR.exists())      LOGGING_DIR.mkdir();
+        if (!DATA_DIR.exists())         DATA_DIR.mkdir();
 
         //  Initialize Nexus
         Nexus.loadNexus(this, LOGGING_DIR);
@@ -88,6 +90,16 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
         NexusLogger.inform("Disabling Nexus: Paper", NexusLogger.LogType.PLATFORM);
         Nexus.unload();
         NexusLogger.shutdown();
+    }
+
+    @Override
+    public @NotNull File getLoggingDirectory() {
+        return LOGGING_DIR;
+    }
+
+    @Override
+    public @NotNull File getDataDirectory() {
+        return DATA_DIR;
     }
 
     @Override
