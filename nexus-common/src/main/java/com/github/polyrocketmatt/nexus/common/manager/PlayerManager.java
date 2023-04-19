@@ -1,21 +1,29 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
+import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
 import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
+import com.github.polyrocketmatt.nexus.common.exception.NexusEntityException;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
 public class PlayerManager implements NexusManager {
 
     private final Set<NexusPlayer> players;
+    private final Map<UUID, Queue<NexusEvent>> messageBox;
 
     public PlayerManager() {
         this.players = new HashSet<>();
+        this.messageBox = new HashMap<>();
     }
 
     @Override
@@ -27,7 +35,10 @@ public class PlayerManager implements NexusManager {
     }
 
     public void registerPlayer(@NotNull NexusPlayer player) {
+        if (this.players.contains(player))
+            return;
         this.players.add(player);
+        this.messageBox.put(player.getUniqueId(), new LinkedList<>());
 
         NexusLogger.inform("Registered player: %s".formatted(player.getUniqueId()), NexusLogger.LogType.COMMON);
     }

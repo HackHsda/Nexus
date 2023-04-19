@@ -27,7 +27,7 @@ public interface NexusPlatform {
 
     @NotNull <T extends NexusModule> T getModule(@NotNull NexusModuleType type);
 
-    @NotNull NexusEntity getPlayer(@NotNull UUID uuid);
+    NexusEntity getPlayer(@NotNull UUID uuid);
 
     void registerPlayer(@NotNull UUID uuid);
 

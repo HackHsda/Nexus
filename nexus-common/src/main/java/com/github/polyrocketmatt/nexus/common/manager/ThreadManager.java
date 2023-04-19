@@ -58,6 +58,8 @@ public class ThreadManager extends Thread implements NexusManager {
 
             //  Return the threads to the pool
             availableThreads += service.getPoolSize();
+
+            NexusLogger.inform("A service has been terminated, returned %s threads to the common pool", NexusLogger.LogType.COMMON, service.getPoolSize());
         } catch (InterruptedException ex) {
             throw new NexusThreadingException("Service interrupted while waiting for termination");
         }
@@ -85,6 +87,20 @@ public class ThreadManager extends Thread implements NexusManager {
         CompletableFuture
                 .supplyAsync(supplier, executor)
                 .thenAccept(consumer);
+        handleTermination(executor, wait);
+    }
+
+    public void submit(Runnable runnable) {
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) getService(1);
+        CompletableFuture
+                .runAsync(runnable, executor);
+        handleTermination(executor, maxDefaultWait);
+    }
+
+    public void submit(Runnable runnable, long wait) {
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) getService(1);
+        CompletableFuture
+                .runAsync(runnable, executor);
         handleTermination(executor, wait);
     }
 

@@ -1,5 +1,7 @@
 package com.github.polyrocketmatt.nexus.common.modules;
 
+import com.github.polyrocketmatt.nexus.api.PlatformType;
+import com.github.polyrocketmatt.nexus.api.module.ModuleHandler;
 import com.github.polyrocketmatt.nexus.api.module.NexusModule;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.Nexus;
@@ -8,10 +10,12 @@ import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import com.github.polyrocketmatt.nexus.common.utils.Pair;
 import com.github.polyrocketmatt.nexus.common.utils.processor.StringProcessor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -24,11 +28,13 @@ public class ClientDetectionModule implements NexusModule {
     private static final String CONNECTION_KEY_PROP_ROUTE = "client-detection.key";
     private final Map<String, Pair<String, String>> connectionKeys;
     private final Map<String, Integer> mods;
+    private final Set<ModuleHandler> handlers;
 
     @SuppressWarnings({"ResultOfMethodCallIgnored"})
     public ClientDetectionModule() {
         this.connectionKeys = new HashMap<>();
         this.mods = new HashMap<>();
+        this.handlers = new HashSet<>();
 
         //  Get all the connection keys from the configuration
         Set<String> keys = Nexus.getPlatform().getConfiguration().getSection(CONNECTION_KEY_ROUTE).getKeys()
@@ -60,13 +66,17 @@ public class ClientDetectionModule implements NexusModule {
 
                 fetchAndPersistMods(file);
             } else {
+                NexusLogger.inform("Loading Forge mods from mods.nexus", NexusLogger.LogType.COMMON);
+
                 //  Load forge mods from file
                 try {
                     var reader = new Scanner(file);
                     while (reader.hasNextLine()) {
                         String line = reader.nextLine();
-                        String[] split = line.split(":");
+                        if (line.isEmpty() || line.isBlank())
+                            continue;
 
+                        String[] split = line.split(":");
                         if (split.length == 2) {
                             String mod = split[0];
                             int index = Integer.parseInt(split[1]);
@@ -81,6 +91,8 @@ public class ClientDetectionModule implements NexusModule {
         });
 
         Nexus.getThreadManager().handleTermination(service, 25000);
+        NexusLogger.inform("Loaded %s connection keys", NexusLogger.LogType.COMMON, connectionKeys.size());
+        NexusLogger.inform("Loaded %s mods", NexusLogger.LogType.COMMON, mods.size());
     }
 
     @SuppressWarnings("unchecked")
@@ -147,7 +159,18 @@ public class ClientDetectionModule implements NexusModule {
     }
 
     @Override
+    public @Nullable ModuleHandler getModuleHandler(PlatformType type) {
+        for (ModuleHandler handler : handlers) {
+            if (handler.getPlatformType() == type)
+                return handler;
+        }
+
+        return null;
+    }
+
+    @Override
     public @NotNull NexusModuleType getModuleType() {
         return NexusModuleType.CLIENT_DETECTION;
     }
+
 }

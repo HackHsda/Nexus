@@ -8,7 +8,6 @@ import com.github.polyrocketmatt.nexus.api.module.NexusModule;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
-import com.github.polyrocketmatt.nexus.common.exception.NexusEntityException;
 import com.github.polyrocketmatt.nexus.common.exception.NexusException;
 import com.github.polyrocketmatt.nexus.common.exception.NexusModuleException;
 import com.github.polyrocketmatt.nexus.common.modules.ClientDetectionModule;
@@ -132,21 +131,20 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
     }
 
     @Override
-    public @NotNull NexusPlayer getPlayer(@NotNull UUID uuid) {
-        NexusPlayer player = Nexus.getPlayerManager().getPlayer(uuid);
-        if (player == null)
-            throw new NexusEntityException("Player \"%s\" could not be found".formatted(uuid.toString()));
-        return player;
+    public NexusPlayer getPlayer(@NotNull UUID uuid) {
+        return Nexus.getPlayerManager().getPlayer(uuid);
     }
 
     @Override
     public void registerPlayer(@NotNull UUID uuid) {
         Player player = Objects.requireNonNull(Bukkit.getPlayer(uuid));
+        Nexus.getEventManager().initialiseMessages(uuid);
         Nexus.getPlayerManager().registerPlayer(new PaperNexusPlayer(player));
     }
 
     @Override
     public void unregisterPlayer(@NotNull UUID uuid) {
+        Nexus.getEventManager().deleteMessages(uuid);
         Nexus.getPlayerManager().unregisterPlayer(uuid);
     }
 
