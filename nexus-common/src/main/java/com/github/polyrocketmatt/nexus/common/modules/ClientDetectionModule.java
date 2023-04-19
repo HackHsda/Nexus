@@ -57,6 +57,8 @@ public class ClientDetectionModule implements NexusModule {
                 } catch (Exception ex) {
                     NexusLogger.warn("Unable to create mods.nexus file", NexusLogger.LogType.COMMON);
                 }
+
+                fetchAndPersistMods(file);
             } else {
                 //  Load forge mods from file
                 try {
