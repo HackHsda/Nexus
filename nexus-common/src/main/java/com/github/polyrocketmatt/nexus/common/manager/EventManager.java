@@ -59,7 +59,8 @@ public class EventManager implements NexusManager {
         eventBox.get(uuid).add(event);
 
         //  Reschedule processing task
-        Nexus.getTaskManager().rescheduleTask(uuid);
+        if (!Nexus.getTaskManager().taskIsRunning(uuid))
+            Nexus.getTaskManager().rescheduleTask(uuid);
 
         NexusLogger.inform("Enqueued event: %s for UUID %s", NexusLogger.LogType.COMMON, event.getClass().getSimpleName(), uuid.toString());
         NexusLogger.inform("    Event Handle: %s", NexusLogger.LogType.COMMON, event.getModuleHandle());

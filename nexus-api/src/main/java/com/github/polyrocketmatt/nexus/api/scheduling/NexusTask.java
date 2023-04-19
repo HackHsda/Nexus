@@ -8,6 +8,7 @@ public abstract class NexusTask extends TimerTask {
     private final UUID taskId;
     private final long delay;
     private final long period;
+    private boolean isRunning = true;
 
     public NexusTask(UUID uuid, long delay, long period) {
         this.taskId = uuid;
@@ -25,5 +26,13 @@ public abstract class NexusTask extends TimerTask {
 
     public long getPeriod() {
         return period;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public void setRunning(boolean running) {
+        isRunning = running;
     }
 }
