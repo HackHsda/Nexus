@@ -5,6 +5,6 @@ public enum PlatformType {
     BUKKIT_SPIGOT,
     BUNGEE,
     PAPER,
-    SPONGE
-
+    SPONGE,
+    UNKNOWN
 }

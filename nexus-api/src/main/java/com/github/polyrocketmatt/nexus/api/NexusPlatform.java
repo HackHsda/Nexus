@@ -38,6 +38,8 @@ public interface NexusPlatform {
 
     @NotNull NexusMetrics initMetrics();
 
-    @NotNull PlatformType getPlatformType();
+    default @NotNull PlatformType getPlatformType() {
+        return PlatformType.UNKNOWN;
+    }
 
 }

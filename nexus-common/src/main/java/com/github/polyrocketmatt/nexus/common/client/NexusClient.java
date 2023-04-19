@@ -9,12 +9,26 @@ import org.jetbrains.annotations.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.time.Duration;
 import java.util.UUID;
 
 public abstract class NexusClient {
+
+    public enum Endpoint {
+        USER("user"),
+        FORGE("forge");
+
+        private final String endpoint;
+
+        Endpoint(String endpoint) {
+            this.endpoint = endpoint;
+        }
+
+        public String getEndpoint() {
+            return endpoint;
+        }
+    }
 
     public enum Method {
         GET,
@@ -27,28 +41,27 @@ public abstract class NexusClient {
     protected final HttpClient client;
 
     public NexusClient() {
-        this.url = Nexus.getProperties().getProperty("network.rest.url");
+        this.url = "https://nexus-vercel-theta.vercel.app/gateway"; //Nexus.getProperties().getProperty("network.rest.url");
         this.client = HttpClient.newHttpClient();
 
-        NexusLogger.inform("A new client has been configured with the following parameters:", NexusLogger.LogType.COMMON);
-        NexusLogger.inform("    URL: %s".formatted(this.url), NexusLogger.LogType.COMMON);
+        //NexusLogger.inform("A new client has been configured with the following parameters:", NexusLogger.LogType.COMMON);
+        //NexusLogger.inform("    URL: %s".formatted(this.url), NexusLogger.LogType.COMMON);
     }
 
-    protected @NotNull HttpRequest construct(@NotNull Method method, @NotNull UUID uuid, @Nullable String body) {
+    protected @NotNull HttpRequest.Builder construct(@NotNull Endpoint endpoint, @NotNull Method method, @Nullable String body) {
         try {
             HttpRequest.Builder builder = HttpRequest.newBuilder()
                     .header("Content-Type", "application/json")
-                    .header("Authorization", uuid.toString())
                     .timeout(Duration.ofSeconds(30));
 
             switch (method) {
-                case GET        -> builder.GET().uri(new URI("%s/%s".formatted(url, "get/")));
-                case POST       -> builder.POST(bodyPublisher(body)).uri(new URI("%s/%s".formatted(url, "post/")));
-                case PUT        -> builder.PUT(bodyPublisher(body)).uri(new URI("%s/%s".formatted(url, "put/")));
-                case DELETE     -> builder.DELETE().uri(new URI("%s/%s".formatted(url, "delete/")));
+                case GET        -> builder.GET().uri(new URI("%s/%s/%s".formatted(url, endpoint.endpoint, "get")));
+                case POST       -> builder.POST(bodyPublisher(body)).uri(new URI("%s/%s".formatted(url, "post")));
+                case PUT        -> builder.PUT(bodyPublisher(body)).uri(new URI("%s/%s".formatted(url, "put")));
+                case DELETE     -> builder.DELETE().uri(new URI("%s/%s".formatted(url, "delete")));
             }
 
-            return builder.build();
+            return builder;
         } catch (URISyntaxException ex) {
             throw new NexusClientException("Failed to construct GET request", url, Method.GET);
         }

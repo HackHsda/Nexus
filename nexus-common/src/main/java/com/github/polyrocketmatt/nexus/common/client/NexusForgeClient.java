@@ -4,32 +4,29 @@ import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.common.exception.NexusClientException;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
 
-public class NexusPlayerStatusClient extends NexusClient {
+public class NexusForgeClient extends NexusClient {
 
-    private final NexusPlayer player;
     private final Gson gson = new Gson();
 
-    public NexusPlayerStatusClient(NexusPlayer player) {
-        this.player = player;
+    public NexusForgeClient() {
     }
 
     @Override
     public <T> @NotNull T get(@NotNull Class<T> clazz) {
         try {
-            HttpRequest request = construct(Endpoint.USER, Method.GET, "")
-                    .header("Authorization", player.getUniqueId().toString())
-                    .build();
+            HttpRequest request = construct(Endpoint.FORGE, Method.GET, "").build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             NexusLogger.inform("Sending GET request to %s", NexusLogger.LogType.COMMON,  request.uri().toString());
-            NexusLogger.inform("Response: %s", NexusLogger.LogType.COMMON, response.body());
 
-            return gson.fromJson(response.body(), clazz);
+            return gson.fromJson(response.body(), new TypeToken<Map<String, String>>(){}.getType());
         } catch (IOException ex) {
             throw new NexusClientException("Failed to send GET request (IOException occurred)", url, Method.GET);
         } catch (InterruptedException ex) {
@@ -51,4 +48,5 @@ public class NexusPlayerStatusClient extends NexusClient {
     public <T> @NotNull T delete(@NotNull Class<T> clazz) {
         throw new NexusClientException("Unsupported Client Method", url, Method.DELETE);
     }
+
 }
