@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 public class ClientDetectionModule implements NexusModule {
@@ -43,40 +44,45 @@ public class ClientDetectionModule implements NexusModule {
             }
         }
 
-        //  Check if mods.nexus exists
-        File file = new File(Nexus.getPlatform().getDataDirectory(), "mods.nexus");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (Exception ex) {
-                NexusLogger.warn("Unable to create mods.nexus file", NexusLogger.LogType.COMMON);
-            }
+        ExecutorService service = Nexus.getThreadManager().getService(1);
 
-            fetchForgeMods();
-            persistForgeMods(file);
-        } else {
-            //  Load forge mods from file
-            try {
-                var reader = new Scanner(file);
-                while (reader.hasNextLine()) {
-                    String line = reader.nextLine();
-                    String[] split = line.split(":");
+        service.submit(() -> {
+            //  Check if mods.nexus exists
+            File file = new File(Nexus.getPlatform().getDataDirectory(), "mods.nexus");
+            if (!file.exists()) {
+                System.out.println("Creating mods.nexus file");
 
-                    if (split.length == 2) {
-                        String mod = split[0];
-                        int index = Integer.parseInt(split[1]);
-
-                        mods.put(mod, index);
-                    }
+                try {
+                    file.createNewFile();
+                } catch (Exception ex) {
+                    NexusLogger.warn("Unable to create mods.nexus file", NexusLogger.LogType.COMMON);
                 }
-            } catch (Exception ex) {
-                NexusLogger.warn("Unable to load Forge mods from mods.nexus", NexusLogger.LogType.COMMON);
+            } else {
+                //  Load forge mods from file
+                try {
+                    var reader = new Scanner(file);
+                    while (reader.hasNextLine()) {
+                        String line = reader.nextLine();
+                        String[] split = line.split(":");
+
+                        if (split.length == 2) {
+                            String mod = split[0];
+                            int index = Integer.parseInt(split[1]);
+
+                            mods.put(mod, index);
+                        }
+                    }
+                } catch (Exception ex) {
+                    NexusLogger.warn("Unable to load Forge mods from mods.nexus", NexusLogger.LogType.COMMON);
+                }
             }
-        }
+        });
+
+        Nexus.getThreadManager().handleTermination(service, 25000);
     }
 
     @SuppressWarnings("unchecked")
-    private void fetchForgeMods() {
+    private void fetchAndPersistMods(File file) {
         //  Load Forge mods
         Nexus.getThreadManager().accept(
                 () -> {
@@ -102,10 +108,15 @@ public class ClientDetectionModule implements NexusModule {
                 },
                 25000
         );
+
+        System.out.println("Mods: " + mods.size());
+        persistForgeMods(file);
     }
 
     private void persistForgeMods(File file) {
         try {
+            System.out.println("Writing mods to file");
+
             FileWriter writer = new FileWriter(file);
 
             //  Write all mods to file

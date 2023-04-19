@@ -55,10 +55,10 @@ public abstract class NexusClient {
                     .timeout(Duration.ofSeconds(30));
 
             switch (method) {
-                case GET        -> builder.GET().uri(new URI("%s/%s/%s".formatted(url, endpoint.endpoint, "get")));
-                case POST       -> builder.POST(bodyPublisher(body)).uri(new URI("%s/%s".formatted(url, "post")));
-                case PUT        -> builder.PUT(bodyPublisher(body)).uri(new URI("%s/%s".formatted(url, "put")));
-                case DELETE     -> builder.DELETE().uri(new URI("%s/%s".formatted(url, "delete")));
+                case GET        -> builder.GET().uri(new URI("%s/%s/%s".formatted(url, endpoint.endpoint, "get/")));
+                case POST       -> builder.POST(bodyPublisher(body)).uri(new URI("%s/%s".formatted(url, "post/")));
+                case PUT        -> builder.PUT(bodyPublisher(body)).uri(new URI("%s/%s".formatted(url, "put/")));
+                case DELETE     -> builder.DELETE().uri(new URI("%s/%s".formatted(url, "delete/")));
             }
 
             return builder;
