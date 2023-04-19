@@ -43,27 +43,18 @@ public class ClientDetectionModule implements NexusModule {
             }
         }
 
-        boolean fetchMods = false;
-        boolean persistMods = false;
-
         //  Check if mods.nexus exists
         File file = new File(Nexus.getPlatform().getDataDirectory(), "mods.nexus");
-
         if (!file.exists()) {
-            fetchMods = true;
-            persistMods = true;
             try {
                 file.createNewFile();
             } catch (Exception ex) {
                 NexusLogger.warn("Unable to create mods.nexus file", NexusLogger.LogType.COMMON);
             }
-        }
 
-        if (fetchMods)
             fetchForgeMods();
-        if (persistMods)
             persistForgeMods(file);
-        else {
+        } else {
             //  Load forge mods from file
             try {
                 var reader = new Scanner(file);
