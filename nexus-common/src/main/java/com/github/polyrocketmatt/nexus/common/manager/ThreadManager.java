@@ -57,7 +57,7 @@ public class ThreadManager extends Thread implements NexusManager {
                 throw new NexusThreadingException("Service did not terminate within the specified time");
 
             //  Return the threads to the pool
-            availableThreads += service.getPoolSize();
+            availableThreads += service.getCorePoolSize();
 
             NexusLogger.inform("A service has been terminated, returned %s threads to the common pool", NexusLogger.LogType.COMMON, service.getPoolSize());
         } catch (InterruptedException ex) {

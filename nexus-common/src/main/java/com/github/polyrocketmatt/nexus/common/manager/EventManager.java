@@ -66,4 +66,10 @@ public class EventManager implements NexusManager {
         return eventBox.get(uuid).poll();
     }
 
+    public int getQueueSize(UUID uuid) {
+        if (!eventBox.containsKey(uuid))
+            throw new NexusEntityException("Player with UUID: %s does not exist!".formatted(uuid));
+        return eventBox.get(uuid).size();
+    }
+
 }

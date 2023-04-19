@@ -56,7 +56,8 @@ public abstract class NexusPlayer implements NexusEntity {
 
         @Override
         public void run() {
-            System.out.printf("Handling events for player %s%n", uuid.toString());
+            System.out.println("Handling events for player %s%n".formatted(uuid.toString()));
+            System.out.println("    Events: " + Nexus.getEventManager().getQueueSize(uuid));
             Nexus.getThreadManager().submit(() -> {
                 var event = Nexus.getEventManager().deque(uuid);
                 while (event != null) {
