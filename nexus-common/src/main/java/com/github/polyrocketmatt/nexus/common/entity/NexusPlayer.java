@@ -48,10 +48,12 @@ public abstract class NexusPlayer implements NexusEntity {
 
     private static class PlayerEventHandlingTask extends NexusTask {
 
+        private final NexusPlayer player;
         private final UUID uuid;
 
-        public PlayerEventHandlingTask(UUID uuid) {
-            this.uuid = uuid;
+        public PlayerEventHandlingTask(NexusPlayer player) {
+            this.player = player;
+            this.uuid = player.getUniqueId();
         }
 
         @Override
@@ -66,7 +68,11 @@ public abstract class NexusPlayer implements NexusEntity {
                     if (module == null)
                         throw new NexusModuleException("Module %s does not exist", event.getModuleHandle());
 
-                    module.getModuleHandler(Nexus.getPlatform().getPlatformType());
+                    System.out.println("    Handling %s".formatted(event.getClass().getSimpleName()));
+
+                    var handler = module.getModuleHandler(Nexus.getPlatform().getPlatformType());
+                    if (handler != null)
+                        handler.process(event, player);
                     event = Nexus.getEventManager().deque(uuid);
                 }
             });

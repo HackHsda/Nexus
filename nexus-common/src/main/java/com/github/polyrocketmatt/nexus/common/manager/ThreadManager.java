@@ -51,13 +51,16 @@ public class ThreadManager extends Thread implements NexusManager {
         if (!services.contains(service))
             throw new NexusThreadingException("Service not registered with manager");
         try {
+            int threadCount = service.getMaximumPoolSize();
+
             service.shutdown();
+
             boolean terminated = service.awaitTermination(maxWait, TimeUnit.MILLISECONDS);
             if (!terminated)
                 throw new NexusThreadingException("Service did not terminate within the specified time");
 
             //  Return the threads to the pool
-            availableThreads += service.getCorePoolSize();
+            availableThreads += threadCount;
 
             NexusLogger.inform("A service has been terminated, returned %s threads to the common pool", NexusLogger.LogType.COMMON, service.getPoolSize());
         } catch (InterruptedException ex) {

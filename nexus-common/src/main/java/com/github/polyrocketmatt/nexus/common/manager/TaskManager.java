@@ -34,6 +34,14 @@ public class TaskManager extends Thread implements NexusManager {
         taskSet.put(task, taskTimer);
     }
 
+    public void removeTask(UUID uuid) {
+        NexusTask task = getTask(uuid);
+        if (task == null)
+            return;
+        task.cancel();
+        taskSet.remove(task);
+    }
+
     public @Nullable NexusTask getTask(UUID uuid) {
         return taskSet.keySet().stream().filter(task -> task.getTaskId().equals(uuid)).findFirst().orElse(null);
     }
