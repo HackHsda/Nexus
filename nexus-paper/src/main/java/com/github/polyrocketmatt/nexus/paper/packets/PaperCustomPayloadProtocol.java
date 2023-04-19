@@ -37,6 +37,9 @@ public class PaperCustomPayloadProtocol extends PaperProtocol {
                 String channel = keys.read(0).getFullKey();
                 String message = ((ByteBuf) modifier.read(1)).toString(StandardCharsets.UTF_8);
 
+                System.out.println("Channel: " + channel);
+                System.out.println("Message: " + message);
+
                 //  Pass the packet information to the client detection module
                 Pair<Boolean, String> result = PaperNexus.getInstance().<ClientDetectionModule>getModule(NexusModuleType.CLIENT_DETECTION)
                         .verify(channel, message);

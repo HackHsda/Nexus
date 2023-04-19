@@ -86,51 +86,41 @@ public class Nexus {
         INSTANCE.metricsManager = new MetricsManager(INSTANCE.platform.getConfiguration().getBoolean("metrics"));
     }
 
-    public static NexusPlatform getPlatform() throws NexusInitException {
-        if (INSTANCE.platform == null)
+    private static <T> T checkInitialised(T object) throws NexusInitException {
+        if (object == null)
             throw new NexusInitException("Nexus has not been initialised yet!");
-        return INSTANCE.platform;
+        return object;
+    }
+
+    public static NexusPlatform getPlatform() throws NexusInitException {
+        return checkInitialised(INSTANCE.platform);
     }
 
     public static Properties getProperties() throws NexusInitException {
-        if (INSTANCE.properties == null)
-            throw new NexusInitException("Nexus has not been initialised yet!");
-        return INSTANCE.properties;
+        return checkInitialised(INSTANCE.properties);
     }
 
     public static EventManager getEventManager() {
-        if (INSTANCE.eventManager == null)
-            throw new NexusInitException("Nexus has not been initialised yet!");
-        return INSTANCE.eventManager;
+        return checkInitialised(INSTANCE.eventManager);
     }
 
     public MetricsManager getMetricsManager() {
-        if (INSTANCE.metricsManager == null)
-            throw new NexusInitException("Nexus has not been initialised yet!");
-        return INSTANCE.metricsManager;
+        return checkInitialised(INSTANCE.metricsManager);
     }
 
     public static ModuleManager getModuleManager() {
-        if (INSTANCE.moduleManager == null)
-            throw new NexusInitException("Nexus has not been initialised yet!");
-        return INSTANCE.moduleManager;
+        return checkInitialised(INSTANCE.moduleManager);
     }
 
     public static PlayerManager getPlayerManager() {
-        if (INSTANCE.playerManager == null)
-            throw new NexusInitException("Nexus has not been initialised yet!");
-        return INSTANCE.playerManager;
+        return checkInitialised(INSTANCE.playerManager);
     }
 
     public static ThreadManager getThreadManager() {
-        if (INSTANCE.threadManager == null)
-            throw new NexusInitException("Nexus has not been initialised yet!");
-        return INSTANCE.threadManager;
+        return checkInitialised(INSTANCE.threadManager);
     }
 
     public static TaskManager getTaskManager() {
-        if (INSTANCE.taskManager == null)
-            throw new NexusInitException("Nexus has not been initialised yet!");
-        return INSTANCE.taskManager;
+        return checkInitialised(INSTANCE.taskManager);
     }
 }
