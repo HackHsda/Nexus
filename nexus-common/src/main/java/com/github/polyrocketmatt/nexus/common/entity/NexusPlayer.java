@@ -33,7 +33,7 @@ public abstract class NexusPlayer implements NexusEntity {
     }
 
     private void schedulePlayerEventHandling() {
-        Nexus.getTaskManager().scheduleTask(new PlayerEventHandlingTask(this, 2500));
+        Nexus.getTaskManager().scheduleTaskAtFixedRate(new PlayerEventHandlingTask(this, 5000));
     }
 
     public UUID getUniqueId() {
@@ -60,8 +60,6 @@ public abstract class NexusPlayer implements NexusEntity {
 
         @Override
         public void run() {
-            System.out.println("Handling events for player %s%n".formatted(uuid.toString()));
-            System.out.println("    Events: " + Nexus.getEventManager().getQueueSize(uuid));
             Nexus.getThreadManager().submit(() -> {
                 var event = Nexus.getEventManager().deque(uuid);
                 while (event != null) {
@@ -69,9 +67,6 @@ public abstract class NexusPlayer implements NexusEntity {
                     var module = Nexus.getModuleManager().getModule(event.getModuleHandle());
                     if (module == null)
                         throw new NexusModuleException("Module %s does not exist", event.getModuleHandle());
-
-                    System.out.println("    Handling %s".formatted(event.getClass().getSimpleName()));
-
                     var handler = module.getModuleHandler(Nexus.getPlatform().getPlatformType());
                     if (handler != null)
                         handler.process(event, player);
@@ -79,7 +74,7 @@ public abstract class NexusPlayer implements NexusEntity {
                 }
 
                 //  If no more tasks, cancel this task
-                Nexus.getTaskManager().cancelTask(uuid);
+                //Nexus.getTaskManager().cancelTask(uuid);
             });
         }
 

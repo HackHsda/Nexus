@@ -1,6 +1,7 @@
 package com.github.polyrocketmatt.nexus.common;
 
 import com.github.polyrocketmatt.nexus.api.NexusPlatform;
+import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
 import com.github.polyrocketmatt.nexus.common.exception.NexusInitException;
 import com.github.polyrocketmatt.nexus.common.manager.EventManager;
 import com.github.polyrocketmatt.nexus.common.manager.MetricsManager;
@@ -10,12 +11,15 @@ import com.github.polyrocketmatt.nexus.common.manager.TaskManager;
 import com.github.polyrocketmatt.nexus.common.manager.ThreadManager;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import com.github.polyrocketmatt.nexus.common.utils.ResourceLoader;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 public class Nexus {
 
@@ -24,6 +28,7 @@ public class Nexus {
     protected NexusPlatform platform;
     protected File workingDirectory;
     private Properties properties;
+    private Set<NexusManager> managers;
     private EventManager eventManager;
     private MetricsManager metricsManager;
     private ModuleManager moduleManager;
@@ -35,11 +40,7 @@ public class Nexus {
         this.platform = null;
         this.workingDirectory = null;
         this.properties = null;
-        this.eventManager = null;
-        this.metricsManager = null;
-        this.moduleManager = null;
-        this.playerManager = null;
-        this.taskManager = null;
+        this.managers = new HashSet<>();
     }
 
     public static void loadNexus(NexusPlatform platform, File workingDirectory) {
@@ -47,23 +48,36 @@ public class Nexus {
         INSTANCE.workingDirectory = workingDirectory;
         INSTANCE.properties = new Properties();
 
-        String prefixFormat = "dd'_'M'_'yyyy'_'hh'_'mm'_'ss";
-        SimpleDateFormat format = new SimpleDateFormat(prefixFormat);
-        String date = format.format(new Date());
-        NexusLogger.initialise(new File(workingDirectory, "nexus_%s.log".formatted(date)), "yyyy-MM-dd HH:mm:ss");
-        NexusLogger.inform("Loading Nexus...", NexusLogger.LogType.COMMON);
+        //  Initialise logger and properties
+        INSTANCE.loadLogger();
+        INSTANCE.loadProperties();
 
-        INSTANCE.load();
+        //  Load managers
         INSTANCE.eventManager = new EventManager();
         INSTANCE.moduleManager = new ModuleManager();
         INSTANCE.playerManager = new PlayerManager();
         INSTANCE.threadManager = new ThreadManager();
         INSTANCE.taskManager = new TaskManager();
 
+        //  Add all managers
+        INSTANCE.managers.add(INSTANCE.eventManager);
+        INSTANCE.managers.add(INSTANCE.moduleManager);
+        INSTANCE.managers.add(INSTANCE.playerManager);
+        INSTANCE.managers.add(INSTANCE.threadManager);
+        INSTANCE.managers.add(INSTANCE.taskManager);
+
         NexusLogger.inform("Nexus loaded successfully for platform: %s", NexusLogger.LogType.COMMON, platform.getPlatformType().name());
     }
 
-    private void load() {
+    private void loadLogger() {
+        String prefixFormat = "dd'_'M'_'yyyy'_'hh'_'mm'_'ss";
+        SimpleDateFormat format = new SimpleDateFormat(prefixFormat);
+        String date = format.format(new Date());
+        NexusLogger.initialise(new File(workingDirectory, "nexus_%s.log".formatted(date)), "yyyy-MM-dd HH:mm:ss");
+        NexusLogger.inform("Loading Nexus...", NexusLogger.LogType.COMMON);
+    }
+
+    private void loadProperties() {
         try {
             properties.load(ResourceLoader.getResource("nexus.properties"));
         } catch (IOException ex) {
@@ -73,17 +87,12 @@ public class Nexus {
 
     public static void unload() {
         NexusLogger.inform("Unloading Nexus...", NexusLogger.LogType.COMMON);
-        if (INSTANCE.eventManager != null)      INSTANCE.eventManager.close();
-        if (INSTANCE.metricsManager != null)    INSTANCE.metricsManager.close();
-        if (INSTANCE.moduleManager != null)     INSTANCE.moduleManager.close();
-        if (INSTANCE.playerManager != null)     INSTANCE.playerManager.close();
-        if (INSTANCE.threadManager != null)     INSTANCE.threadManager.close();
-        if (INSTANCE.taskManager != null)       INSTANCE.taskManager.close();
-        NexusLogger.inform("Nexus unloaded successfully", NexusLogger.LogType.COMMON);
-    }
 
-    public static void postLoad() {
-        INSTANCE.metricsManager = new MetricsManager(INSTANCE.platform.getConfiguration().getBoolean("metrics"));
+        //  Close all managers
+        INSTANCE.managers.forEach(NexusManager::close);
+        INSTANCE.managers.clear();
+
+        NexusLogger.inform("Nexus unloaded successfully", NexusLogger.LogType.COMMON);
     }
 
     private static <T> T checkInitialised(T object) throws NexusInitException {
@@ -92,35 +101,35 @@ public class Nexus {
         return object;
     }
 
-    public static NexusPlatform getPlatform() throws NexusInitException {
+    public static void registerManager(@NotNull NexusManager manager) {
+        INSTANCE.managers.add(manager);
+    }
+
+    public static @NotNull NexusPlatform getPlatform() throws NexusInitException {
         return checkInitialised(INSTANCE.platform);
     }
 
-    public static Properties getProperties() throws NexusInitException {
+    public static @NotNull Properties getProperties() throws NexusInitException {
         return checkInitialised(INSTANCE.properties);
     }
 
-    public static EventManager getEventManager() {
+    public static @NotNull EventManager getEventManager() {
         return checkInitialised(INSTANCE.eventManager);
     }
 
-    public MetricsManager getMetricsManager() {
-        return checkInitialised(INSTANCE.metricsManager);
-    }
-
-    public static ModuleManager getModuleManager() {
+    public static @NotNull ModuleManager getModuleManager() {
         return checkInitialised(INSTANCE.moduleManager);
     }
 
-    public static PlayerManager getPlayerManager() {
+    public static @NotNull PlayerManager getPlayerManager() {
         return checkInitialised(INSTANCE.playerManager);
     }
 
-    public static ThreadManager getThreadManager() {
+    public static @NotNull ThreadManager getThreadManager() {
         return checkInitialised(INSTANCE.threadManager);
     }
 
-    public static TaskManager getTaskManager() {
+    public static @NotNull TaskManager getTaskManager() {
         return checkInitialised(INSTANCE.taskManager);
     }
 }

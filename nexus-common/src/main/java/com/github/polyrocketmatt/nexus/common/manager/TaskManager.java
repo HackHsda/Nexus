@@ -17,6 +17,8 @@ public class TaskManager extends Thread implements NexusManager {
 
     public TaskManager() {
         this.taskSet = new HashMap<>();
+
+        NexusLogger.inform("Initialised %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
     @Override
@@ -52,7 +54,7 @@ public class TaskManager extends Thread implements NexusManager {
                 .orElse(false);
     }
 
-    public void scheduleTask(NexusTask task) {
+    public void scheduleTaskAtFixedRate(NexusTask task) {
         long delay = task.getDelay();
         long period = task.getPeriod();
 
@@ -62,13 +64,15 @@ public class TaskManager extends Thread implements NexusManager {
         task.setRunning(true);
 
         NexusLogger.inform("Scheduled task %s", NexusLogger.LogType.COMMON, task.getTaskId());
+        NexusLogger.inform("    Delay: %s", NexusLogger.LogType.COMMON, task.getDelay());
+        NexusLogger.inform("    Period: %s", NexusLogger.LogType.COMMON, task.getPeriod());
     }
 
     public void rescheduleTask(UUID uuid) {
         NexusTask task = getTask(uuid);
         if (task == null)
             return;
-        scheduleTask(task);
+        scheduleTaskAtFixedRate(task);
 
         NexusLogger.inform("Rescheduled task %s", NexusLogger.LogType.COMMON, task.getTaskId());
     }

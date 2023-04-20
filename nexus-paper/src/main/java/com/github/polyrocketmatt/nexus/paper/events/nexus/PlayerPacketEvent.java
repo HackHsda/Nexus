@@ -1,14 +1,17 @@
-package com.github.polyrocketmatt.nexus.paper.events.types;
+package com.github.polyrocketmatt.nexus.paper.events.nexus;
 
 import com.comphenix.protocol.events.PacketEvent;
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 
-public class ProtocolPacketEvent implements NexusEvent {
+import java.util.UUID;
+
+public class PlayerPacketEvent extends NexusEvent {
 
     private final PacketEvent event;
 
-    public ProtocolPacketEvent(PacketEvent event) {
+    public PlayerPacketEvent(UUID uuid, PacketEvent event) {
+        super(uuid);
         this.event = event;
     }
 

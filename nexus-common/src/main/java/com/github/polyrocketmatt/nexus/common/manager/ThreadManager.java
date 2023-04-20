@@ -5,8 +5,8 @@ import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.exception.NexusThreadingException;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,30 +17,31 @@ import java.util.function.Supplier;
 
 import static java.lang.Math.min;
 
-public class ThreadManager extends Thread implements NexusManager {
+public class ThreadManager implements NexusManager {
 
-    private final Set<ThreadPoolExecutor> services;
+    private final Map<ThreadPoolExecutor, Integer> services;
     private final int maxThreadCount;
     private final long maxDefaultWait;
 
     private int availableThreads;
 
     public ThreadManager() {
-        this.services = new HashSet<>();
+        this.services = new HashMap<>();
         this.maxThreadCount = Integer.parseInt(Nexus.getProperties().getProperty("threading.pool-size"));
         this.maxDefaultWait = Long.parseLong(Nexus.getProperties().getProperty("threading.max-default-wait"));
         this.availableThreads = maxThreadCount;
 
-        NexusLogger.inform("Thread manager initialised on thread %s", NexusLogger.LogType.COMMON, Thread.currentThread().getName());
+        NexusLogger.inform("Initialised %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
         NexusLogger.inform("    Thread pool size: %s", NexusLogger.LogType.COMMON, maxThreadCount);
     }
 
     public ExecutorService getService(int threadCount) {
         int grantedThreads = min(threadCount, availableThreads);
 
+        NexusLogger.inform("Service request -> %s threads (%s available)", NexusLogger.LogType.COMMON, grantedThreads, availableThreads);
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(grantedThreads);
         availableThreads -= grantedThreads;
-        services.add(executor);
+        services.put(executor, grantedThreads);
 
         return executor;
     }
@@ -48,10 +49,10 @@ public class ThreadManager extends Thread implements NexusManager {
     public void handleTermination(ExecutorService executorService, long maxWait) throws NexusThreadingException {
         if (!(executorService instanceof ThreadPoolExecutor service))
             throw new NexusThreadingException("Service is not a thread pool executor");
-        if (!services.contains(service))
+        if (!services.containsKey(service))
             throw new NexusThreadingException("Service not registered with manager");
         try {
-            int threadCount = service.getMaximumPoolSize();
+            int threadCount = services.get(service);
 
             service.shutdown();
 
@@ -62,7 +63,7 @@ public class ThreadManager extends Thread implements NexusManager {
             //  Return the threads to the pool
             availableThreads += threadCount;
 
-            NexusLogger.inform("A service has been terminated, returned %s threads to the common pool", NexusLogger.LogType.COMMON, service.getPoolSize());
+            NexusLogger.inform("A service has been terminated, returned %s threads to the common pool", NexusLogger.LogType.COMMON, threadCount);
         } catch (InterruptedException ex) {
             throw new NexusThreadingException("Service interrupted while waiting for termination");
         }
@@ -71,7 +72,7 @@ public class ThreadManager extends Thread implements NexusManager {
     @Override
     public void close() {
         int serviceCount = services.size();
-        services.forEach(service -> handleTermination(service, maxDefaultWait));
+        services.forEach((service, threads) -> handleTermination(service, maxDefaultWait));
 
         NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
         NexusLogger.inform("    Forced Shutdown Count: %s", NexusLogger.LogType.COMMON, serviceCount);

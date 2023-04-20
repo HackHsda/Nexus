@@ -1,9 +1,9 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
+import com.github.polyrocketmatt.nexus.api.events.InternalEventListener;
+import com.github.polyrocketmatt.nexus.api.events.ExternalEventListener;
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
-import com.github.polyrocketmatt.nexus.api.events.NexusListener;
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
-import com.github.polyrocketmatt.nexus.api.scheduling.NexusTask;
 import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.exception.NexusEntityException;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
@@ -20,62 +20,79 @@ import java.util.UUID;
 
 public class EventManager implements NexusManager {
 
-    private final Set<NexusListener> listeners;
-    private final Map<UUID, Queue<NexusEvent>> eventBox;
+    private final Set<ExternalEventListener> externalListeners;
+    private final Set<InternalEventListener> internalListeners;
+    private final Map<UUID, Queue<NexusEvent>> eventQueues;
 
     public EventManager() {
-        this.listeners = new HashSet<>();
-        this.eventBox = new HashMap<>();
+        this.externalListeners = new HashSet<>();
+        this.internalListeners = new HashSet<>();
+        this.eventQueues = new HashMap<>();
+
+        NexusLogger.inform("Initialised %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
     @Override
     public void close() {
-        this.listeners.clear();
+        this.externalListeners.clear();
+        this.internalListeners.clear();
 
         NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
-    public void registerListener(NexusListener listener) {
-        this.listeners.add(listener);
+    public void registerInternalListener(@NotNull InternalEventListener listener) {
+        this.internalListeners.add(listener);
 
-        NexusLogger.inform("Registered listener: %s", NexusLogger.LogType.COMMON, listener.getClass().getSimpleName());
+        NexusLogger.inform("Registered internal listener: %s", NexusLogger.LogType.COMMON, listener.getClass().getSimpleName());
     }
 
-    public void initialiseMessages(@NotNull UUID uuid) {
-        if (eventBox.containsKey(uuid))
+    public void registerExternalListener(@NotNull ExternalEventListener listener) {
+        this.externalListeners.add(listener);
+
+        NexusLogger.inform("Registered external listener: %s", NexusLogger.LogType.COMMON, listener.getClass().getSimpleName());
+    }
+
+    public void dispatch(@NotNull NexusEvent event) {
+        Nexus.getThreadManager().submit(() -> {
+            internalListeners.forEach(listener -> listener.handle(event));
+            enqueue(event.getUniqueId(), event);
+        });
+    }
+
+    public void initialiseEventQueue(@NotNull UUID uuid) {
+        if (eventQueues.containsKey(uuid))
             return;
-        eventBox.put(uuid, new LinkedList<>());
+        eventQueues.put(uuid, new LinkedList<>());
     }
 
-    public void deleteMessages(@NotNull UUID uuid) {
-        if (!eventBox.containsKey(uuid))
+    public void removeEventQueue(@NotNull UUID uuid) {
+        if (!eventQueues.containsKey(uuid))
             return;
-        eventBox.remove(uuid);
+        eventQueues.remove(uuid);
     }
 
-    public void enqueue(UUID uuid, NexusEvent event) {
-        if (!eventBox.containsKey(uuid))
+    public void enqueue(@NotNull UUID uuid, @NotNull NexusEvent event) {
+        if (!eventQueues.containsKey(uuid))
             throw new NexusEntityException("Player with UUID: %s does not exist!".formatted(uuid));
-        eventBox.get(uuid).add(event);
+        eventQueues.get(uuid).add(event);
 
         //  Reschedule processing task
         if (!Nexus.getTaskManager().taskIsRunning(uuid))
             Nexus.getTaskManager().rescheduleTask(uuid);
-
         NexusLogger.inform("Enqueued event: %s for UUID %s", NexusLogger.LogType.COMMON, event.getClass().getSimpleName(), uuid.toString());
         NexusLogger.inform("    Event Handle: %s", NexusLogger.LogType.COMMON, event.getModuleHandle());
     }
 
-    public @Nullable NexusEvent deque(UUID uuid) {
-        if (!eventBox.containsKey(uuid))
+    public @Nullable NexusEvent deque(@NotNull UUID uuid) {
+        if (!eventQueues.containsKey(uuid))
             throw new NexusEntityException("Player with UUID: %s does not exist!".formatted(uuid));
-        return eventBox.get(uuid).poll();
+        return eventQueues.get(uuid).poll();
     }
 
-    public int getQueueSize(UUID uuid) {
-        if (!eventBox.containsKey(uuid))
+    public int getQueueSize(@NotNull UUID uuid) {
+        if (!eventQueues.containsKey(uuid))
             throw new NexusEntityException("Player with UUID: %s does not exist!".formatted(uuid));
-        return eventBox.get(uuid).size();
+        return eventQueues.get(uuid).size();
     }
 
 }

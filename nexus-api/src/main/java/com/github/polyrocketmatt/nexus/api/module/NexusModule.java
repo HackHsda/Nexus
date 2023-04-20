@@ -9,7 +9,7 @@ import java.util.Set;
 
 public abstract class NexusModule {
 
-    private Set<ModuleHandler> handlers;
+    private final Set<ModuleProcessor> handlers;
 
     public NexusModule() {
         this.handlers = new HashSet<>();
@@ -17,16 +17,15 @@ public abstract class NexusModule {
 
     public abstract @NotNull NexusModuleType getModuleType();
 
-    public @Nullable ModuleHandler getModuleHandler(PlatformType type) {
-        for (ModuleHandler handler : handlers) {
+    public @Nullable ModuleProcessor getModuleHandler(PlatformType type) {
+        for (ModuleProcessor handler : handlers)
             if (handler.getPlatformType() == type)
                 return handler;
-        }
 
         return null;
     }
 
-    public void addModuleHandler(ModuleHandler handler) {
+    public void addModuleHandler(ModuleProcessor handler) {
         this.handlers.add(handler);
     }
 

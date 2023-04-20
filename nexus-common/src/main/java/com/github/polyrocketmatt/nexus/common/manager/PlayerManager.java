@@ -24,6 +24,8 @@ public class PlayerManager implements NexusManager {
     public PlayerManager() {
         this.players = new HashSet<>();
         this.messageBox = new HashMap<>();
+
+        NexusLogger.inform("Initialised %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
     @Override

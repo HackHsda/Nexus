@@ -12,7 +12,7 @@ public class MetricsManager implements NexusManager {
     public MetricsManager(boolean enabled) {
         this.metrics = enabled ? Nexus.getPlatform().initMetrics() : null;
         if (enabled)
-            NexusLogger.inform("Metrics have been enabled.", NexusLogger.LogType.COMMON);
+            NexusLogger.inform("Initialised %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
     @Override

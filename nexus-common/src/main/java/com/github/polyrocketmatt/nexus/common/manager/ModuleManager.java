@@ -1,7 +1,7 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
-import com.github.polyrocketmatt.nexus.api.module.ModuleHandler;
+import com.github.polyrocketmatt.nexus.api.module.ModuleProcessor;
 import com.github.polyrocketmatt.nexus.api.module.NexusModule;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.exception.NexusModuleException;
@@ -17,46 +17,49 @@ public class ModuleManager implements NexusManager {
 
     public ModuleManager() {
         this.modules = new HashSet<>();
+
+        NexusLogger.inform("Initialised %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
     @Override
     public void close() {
-        this.modules.clear();
+        modules.clear();
 
         NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
-    public void registerModule(NexusModule module) {
+    public NexusModule registerModule(NexusModule module) {
         if (isEnabled(module.getModuleType()))
             throw new NexusModuleException("Module %s is already enabled".formatted(module.getModuleType().name()), module.getModuleType());
-        this.modules.add(module);
+        modules.add(module);
 
         NexusLogger.inform("Registered module: %s".formatted(module.getModuleType().name()), NexusLogger.LogType.COMMON);
+
+        return module;
     }
 
-    public void registerModuleHandler(NexusModuleType type, ModuleHandler handler) {
-        if (!isEnabled(type))
-            throw new NexusModuleException("Module %s is not enabled".formatted(type.name()), type);
-        NexusModule module = getModule(type);
-        if (module == null)
-            throw new NexusModuleException("Module %s is not enabled".formatted(type.name()), type);
-        module.addModuleHandler(handler);
+    public void registerModuleHandler(NexusModuleType type, ModuleProcessor handler) {
+        if (isEnabled(type)) {
+            NexusModule module = getModule(type);
+            if (module != null)
+                module.addModuleHandler(handler);
+        }
     }
 
     public void unregisterModule(NexusModule module) {
         if (!isEnabled(module.getModuleType()))
             throw new NexusModuleException("Module %s is not enabled".formatted(module.getModuleType().name()), module.getModuleType());
-        this.modules.remove(module);
+        modules.remove(module);
 
         NexusLogger.inform("Unregistered module: %s".formatted(module.getModuleType().name()), NexusLogger.LogType.COMMON);
     }
 
     public boolean isEnabled(NexusModuleType type) {
-        return this.modules.stream().anyMatch(module -> module.getModuleType() == type);
+        return modules.stream().anyMatch(module -> module.getModuleType() == type);
     }
 
     public @Nullable NexusModule getModule(NexusModuleType type) {
-        return this.modules.stream().filter(module -> module.getModuleType() == type).findFirst().orElse(null);
+        return modules.stream().filter(module -> module.getModuleType() == type).findFirst().orElse(null);
     }
 
 }

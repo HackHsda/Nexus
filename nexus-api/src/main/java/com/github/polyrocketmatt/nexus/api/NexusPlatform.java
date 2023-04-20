@@ -1,8 +1,9 @@
 package com.github.polyrocketmatt.nexus.api;
 
 import com.github.polyrocketmatt.nexus.api.entity.NexusEntity;
-import com.github.polyrocketmatt.nexus.api.events.NexusListener;
+import com.github.polyrocketmatt.nexus.api.events.ExternalEventListener;
 import com.github.polyrocketmatt.nexus.api.metrics.NexusMetrics;
+import com.github.polyrocketmatt.nexus.api.module.ModuleProcessor;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 import com.github.polyrocketmatt.nexus.api.module.NexusModule;
 import dev.dejvokep.boostedyaml.YamlDocument;
@@ -21,9 +22,9 @@ public interface NexusPlatform {
 
     @NotNull YamlDocument getConfiguration();
 
-    void registerListener(@NotNull NexusListener listener);
+    void registerListener(@NotNull ExternalEventListener listener);
 
-    void registerModule(@NotNull NexusModule module);
+    void registerModule(@NotNull NexusModule module, @NotNull ModuleProcessor... processors);
 
     @NotNull <T extends NexusModule> T getModule(@NotNull NexusModuleType type);
 

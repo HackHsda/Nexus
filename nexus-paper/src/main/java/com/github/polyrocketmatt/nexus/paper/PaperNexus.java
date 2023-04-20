@@ -2,23 +2,26 @@ package com.github.polyrocketmatt.nexus.paper;
 
 import com.github.polyrocketmatt.nexus.api.NexusPlatform;
 import com.github.polyrocketmatt.nexus.api.PlatformType;
-import com.github.polyrocketmatt.nexus.api.events.NexusListener;
+import com.github.polyrocketmatt.nexus.api.events.ExternalEventListener;
 import com.github.polyrocketmatt.nexus.api.metrics.NexusMetrics;
+import com.github.polyrocketmatt.nexus.api.module.ModuleProcessor;
 import com.github.polyrocketmatt.nexus.api.module.NexusModule;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.common.exception.NexusException;
 import com.github.polyrocketmatt.nexus.common.exception.NexusModuleException;
+import com.github.polyrocketmatt.nexus.common.manager.MetricsManager;
 import com.github.polyrocketmatt.nexus.common.modules.ClientDetectionModule;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import com.github.polyrocketmatt.nexus.common.utils.ResourceLoader;
 import com.github.polyrocketmatt.nexus.common.utils.YamlDocManager;
 import com.github.polyrocketmatt.nexus.paper.entity.PaperNexusPlayer;
-import com.github.polyrocketmatt.nexus.paper.events.PaperConnectionListener;
+import com.github.polyrocketmatt.nexus.paper.events.bukkit.listeners.PaperConnectionListener;
+import com.github.polyrocketmatt.nexus.paper.handlers.PaperCustomPayloadHandler;
 import com.github.polyrocketmatt.nexus.paper.metrics.PaperMetrics;
-import com.github.polyrocketmatt.nexus.paper.packets.PaperCustomPayloadProtocol;
-import com.github.polyrocketmatt.nexus.paper.packets.PaperPacketProtocol;
+import com.github.polyrocketmatt.nexus.paper.events.packets.listeners.PaperCustomPayloadListener;
+import com.github.polyrocketmatt.nexus.paper.events.packets.PaperPacketManager;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,6 +29,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -36,7 +40,7 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
     private final File LOGGING_DIR = new File(getDataFolder(), "logging");
     private final File DATA_DIR = new File(getDataFolder(), "data");
     private YamlDocument configuration;
-    private PaperPacketProtocol protocol;
+    private PaperPacketManager packetManager;
 
     public PaperNexus() { instance = this; }
 
@@ -52,9 +56,6 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
         if (!LOGGING_DIR.exists())      LOGGING_DIR.mkdir();
         if (!DATA_DIR.exists())         DATA_DIR.mkdir();
 
-        //  Initialize Nexus
-        Nexus.loadNexus(this, LOGGING_DIR);
-
         //  Initialize Configuration
         configuration = YamlDocManager.get(getDataFolder(), "config");
 
@@ -62,8 +63,11 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
         if (install)
             install();
 
+        //  Initialize Nexus
+        Nexus.loadNexus(this, LOGGING_DIR);
+
         //  Initialize ProtocolLib
-        protocol = new PaperPacketProtocol();
+        packetManager = new PaperPacketManager();
     }
 
     @Override
@@ -75,13 +79,13 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
 
         //  Initialize Nexus Modules
         if (configuration.getBoolean("modules.client-detection.enabled"))
-            registerModule(new ClientDetectionModule());
+            registerModule(new ClientDetectionModule(), new PaperCustomPayloadHandler());
 
         //  Initialize Packet Protocols
-        protocol.register(new PaperCustomPayloadProtocol());
+        packetManager.register(new PaperCustomPayloadListener());
 
         //  Post load
-        Nexus.postLoad();
+        Nexus.registerManager(new MetricsManager(configuration.getBoolean("metrics")));
     }
 
     @Override
@@ -112,13 +116,14 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
     }
 
     @Override
-    public void registerListener(@NotNull NexusListener listener) {
-        Nexus.getEventManager().registerListener(listener);
+    public void registerListener(@NotNull ExternalEventListener listener) {
+        Nexus.getEventManager().registerExternalListener(listener);
     }
 
     @Override
-    public void registerModule(@NotNull NexusModule module) {
+    public void registerModule(@NotNull NexusModule module, @NotNull ModuleProcessor...processors) {
         Nexus.getModuleManager().registerModule(module);
+        Arrays.stream(processors).forEach(module::addModuleHandler);
     }
 
     @SuppressWarnings("unchecked")
@@ -138,13 +143,13 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
     @Override
     public void registerPlayer(@NotNull UUID uuid) {
         Player player = Objects.requireNonNull(Bukkit.getPlayer(uuid));
-        Nexus.getEventManager().initialiseMessages(uuid);
+        Nexus.getEventManager().initialiseEventQueue(uuid);
         Nexus.getPlayerManager().registerPlayer(new PaperNexusPlayer(player));
     }
 
     @Override
     public void unregisterPlayer(@NotNull UUID uuid) {
-        Nexus.getEventManager().deleteMessages(uuid);
+        Nexus.getEventManager().removeEventQueue(uuid);
         Nexus.getPlayerManager().unregisterPlayer(uuid);
     }
 

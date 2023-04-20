@@ -1,62 +1,41 @@
-package com.github.polyrocketmatt.nexus.paper.packets;
+package com.github.polyrocketmatt.nexus.paper.handlers;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.MinecraftKey;
 import com.github.polyrocketmatt.nexus.api.PlatformType;
 import com.github.polyrocketmatt.nexus.api.entity.NexusEntity;
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
-import com.github.polyrocketmatt.nexus.api.module.ModuleHandler;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
-import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.common.modules.ClientDetectionModule;
+import com.github.polyrocketmatt.nexus.common.modules.ModuleHandler;
 import com.github.polyrocketmatt.nexus.common.utils.Pair;
 import com.github.polyrocketmatt.nexus.paper.PaperNexus;
-import com.github.polyrocketmatt.nexus.paper.events.types.ProtocolPacketEvent;
+import com.github.polyrocketmatt.nexus.paper.events.nexus.PlayerPacketEvent;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
-public class PaperCustomPayloadProtocol extends PaperProtocol implements ModuleHandler {
+public class PaperCustomPayloadHandler extends ModuleHandler {
 
-    private final PacketAdapter adapter;
     private final String clientDetectedMessage = PaperNexus.getInstance().getConfiguration().getString("messages.client-detected");
     private final String modDetectedMessage = PaperNexus.getInstance().getConfiguration().getString("messages.mod-detected");
     private final boolean checkMods = PaperNexus.getInstance().getConfiguration().getBoolean("modules.client-detection.mod-options.check-mods");
 
-    public PaperCustomPayloadProtocol() {
-        super(PacketType.Play.Client.CUSTOM_PAYLOAD);
+    public PaperCustomPayloadHandler() {
+        super(NexusModuleType.CLIENT_DETECTION);
+    }
 
-        //  Register as a handler for the client detection module
-        Nexus.getModuleManager().registerModuleHandler(NexusModuleType.CLIENT_DETECTION, this);
-
-        this.adapter = new PacketAdapter(
-                PaperNexus.getInstance(),
-                ListenerPriority.HIGHEST,
-                PacketType.Play.Client.CUSTOM_PAYLOAD
-        ) {
-            @Override
-            public void onPacketReceiving(PacketEvent event) {
-                NexusPlayer player = PaperNexus.getInstance().getPlayer(event.getPlayer().getUniqueId());
-                ProtocolPacketEvent nexusEvent = new ProtocolPacketEvent(event);
-
-                if (player != null)
-                    process(nexusEvent, player);
-                else
-                    Nexus.getEventManager().enqueue(event.getPlayer().getUniqueId(), nexusEvent);
-            }
-        };
+    @Override
+    public PlatformType getPlatformType() {
+        return PlatformType.PAPER;
     }
 
     @Override
     public void process(NexusEvent nexusEvent, NexusEntity entity) {
-        if (!(nexusEvent instanceof ProtocolPacketEvent event))
+        if (!(nexusEvent instanceof PlayerPacketEvent event))
             return;
         if (!(entity instanceof NexusPlayer player))
             return;
@@ -74,6 +53,7 @@ public class PaperCustomPayloadProtocol extends PaperProtocol implements ModuleH
         //  Pass the packet information to the client detection module
         Pair<Boolean, String> detectionResult = PaperNexus.getInstance().<ClientDetectionModule>getModule(NexusModuleType.CLIENT_DETECTION)
                 .verify(channel, message);
+
         if (!detectionResult.getFirst())
             player.sendMessage(clientDetectedMessage.formatted(detectionResult.getSecond()));
 
@@ -88,13 +68,4 @@ public class PaperCustomPayloadProtocol extends PaperProtocol implements ModuleH
         mods.forEach(mod -> player.sendMessage(modDetectedMessage.formatted(mod)));
     }
 
-    @Override
-    public PacketAdapter getAdapter() {
-        return adapter;
-    }
-
-    @Override
-    public PlatformType getPlatformType() {
-        return PlatformType.PAPER;
-    }
 }
