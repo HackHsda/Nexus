@@ -1,8 +1,5 @@
 package com.github.polyrocketmatt.nexus.paper.handlers;
 
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.reflect.StructureModifier;
-import com.comphenix.protocol.wrappers.MinecraftKey;
 import com.github.polyrocketmatt.nexus.api.PlatformType;
 import com.github.polyrocketmatt.nexus.api.entity.NexusEntity;
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
@@ -13,15 +10,13 @@ import com.github.polyrocketmatt.nexus.common.modules.ModuleHandler;
 import com.github.polyrocketmatt.nexus.common.utils.Pair;
 import com.github.polyrocketmatt.nexus.paper.PaperNexus;
 import com.github.polyrocketmatt.nexus.paper.events.nexus.PlayerPacketEvent;
-import io.netty.buffer.ByteBuf;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 public class PaperCustomPayloadHandler extends ModuleHandler {
 
-    private final String clientDetectedMessage = PaperNexus.getInstance().getConfiguration().getString("messages.client-detected");
-    private final String modDetectedMessage = PaperNexus.getInstance().getConfiguration().getString("messages.mod-detected");
+    private final String clientDetectedMessage = PaperNexus.getInstance().getMessages().getString("client-detected");
+    private final String modDetectedMessage = PaperNexus.getInstance().getMessages().getString("mod-detected");
     private final boolean checkMods = PaperNexus.getInstance().getConfiguration().getBoolean("modules.client-detection.mod-options.check-mods");
 
     public PaperCustomPayloadHandler() {

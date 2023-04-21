@@ -40,6 +40,7 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
     private final File LOGGING_DIR = new File(getDataFolder(), "logging");
     private final File DATA_DIR = new File(getDataFolder(), "data");
     private YamlDocument configuration;
+    private YamlDocument messages;
     private PaperPacketManager packetManager;
 
     public PaperNexus() { instance = this; }
@@ -58,6 +59,7 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
 
         //  Initialize Configuration
         configuration = YamlDocManager.get(getDataFolder(), "config");
+        messages = YamlDocManager.get(getDataFolder(), "messages");
 
         //  Install if necessary
         if (install)
@@ -113,6 +115,11 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
     @Override
     public @NotNull YamlDocument getConfiguration() {
         return configuration;
+    }
+
+    @Override
+    public @NotNull YamlDocument getMessages() {
+        return messages;
     }
 
     @Override

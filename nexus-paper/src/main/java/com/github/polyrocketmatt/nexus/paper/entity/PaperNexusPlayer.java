@@ -21,4 +21,8 @@ public class PaperNexusPlayer extends NexusPlayer {
                 .formatted(PaperNexus.getInstance().getPrefix(), message)));
     }
 
+    @Override
+    public boolean hasPermission(@NotNull String permission) {
+        return player.hasPermission(permission) || player.isOp();
+    }
 }

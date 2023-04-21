@@ -22,6 +22,8 @@ public interface NexusPlatform {
 
     @NotNull YamlDocument getConfiguration();
 
+    @NotNull YamlDocument getMessages();
+
     void registerListener(@NotNull ExternalEventListener listener);
 
     void registerModule(@NotNull NexusModule module, @NotNull ModuleProcessor... processors);

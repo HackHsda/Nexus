@@ -38,4 +38,6 @@ public abstract class NexusPlayer implements NexusEntity {
 
     public abstract void sendMessage(@NotNull String message);
 
+    public abstract boolean hasPermission(@NotNull String permission);
+
 }

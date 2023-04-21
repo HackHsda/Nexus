@@ -3,6 +3,7 @@ package com.github.polyrocketmatt.nexus.common;
 import com.github.polyrocketmatt.nexus.api.NexusPlatform;
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
 import com.github.polyrocketmatt.nexus.common.exception.NexusInitException;
+import com.github.polyrocketmatt.nexus.common.manager.CommandManager;
 import com.github.polyrocketmatt.nexus.common.manager.EventManager;
 import com.github.polyrocketmatt.nexus.common.manager.MetricsManager;
 import com.github.polyrocketmatt.nexus.common.manager.ModuleManager;
@@ -33,6 +34,7 @@ public class Nexus {
     private ModuleManager moduleManager;
     private PlayerManager playerManager;
     private ThreadManager threadManager;
+    private CommandManager commandManager;
 
     private Nexus() {
         this.platform = null;
@@ -55,12 +57,14 @@ public class Nexus {
         INSTANCE.moduleManager = new ModuleManager();
         INSTANCE.playerManager = new PlayerManager();
         INSTANCE.threadManager = new ThreadManager();
+        INSTANCE.commandManager = new CommandManager();
 
         //  Add all managers
         INSTANCE.managers.add(INSTANCE.eventManager);
         INSTANCE.managers.add(INSTANCE.moduleManager);
         INSTANCE.managers.add(INSTANCE.playerManager);
         INSTANCE.managers.add(INSTANCE.threadManager);
+        INSTANCE.managers.add(INSTANCE.commandManager);
 
         NexusLogger.inform("Nexus loaded successfully for platform: %s", NexusLogger.LogType.COMMON, platform.getPlatformType().name());
     }
