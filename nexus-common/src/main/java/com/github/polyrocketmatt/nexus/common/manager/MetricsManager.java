@@ -20,6 +20,11 @@ public class MetricsManager implements NexusManager {
         NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
+    @Override
+    public void log() {
+
+    }
+
     public NexusMetrics getMetrics() {
         return metrics;
     }

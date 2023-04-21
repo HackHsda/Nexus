@@ -143,13 +143,11 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
     @Override
     public void registerPlayer(@NotNull UUID uuid) {
         Player player = Objects.requireNonNull(Bukkit.getPlayer(uuid));
-        Nexus.getEventManager().initialiseEventQueue(uuid);
         Nexus.getPlayerManager().registerPlayer(new PaperNexusPlayer(player));
     }
 
     @Override
     public void unregisterPlayer(@NotNull UUID uuid) {
-        Nexus.getEventManager().removeEventQueue(uuid);
         Nexus.getPlayerManager().unregisterPlayer(uuid);
     }
 

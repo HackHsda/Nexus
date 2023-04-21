@@ -28,14 +28,21 @@ public class ModuleManager implements NexusManager {
         NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
-    public NexusModule registerModule(NexusModule module) {
+    @Override
+    public void log() {
+        NexusLogger.inform("Module Manager", NexusLogger.LogType.COMMON, modules);
+        NexusLogger.inform("-------------", NexusLogger.LogType.COMMON, modules);
+        NexusLogger.inform("    Modules: %s", NexusLogger.LogType.COMMON, modules.size());
+        NexusLogger.inform("", NexusLogger.LogType.COMMON);
+    }
+
+    public void registerModule(NexusModule module) {
         if (isEnabled(module.getModuleType()))
             throw new NexusModuleException("Module %s is already enabled".formatted(module.getModuleType().name()), module.getModuleType());
         modules.add(module);
 
         NexusLogger.inform("Registered module: %s".formatted(module.getModuleType().name()), NexusLogger.LogType.COMMON);
 
-        return module;
     }
 
     public void registerModuleHandler(NexusModuleType type, ModuleProcessor handler) {

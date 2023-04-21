@@ -49,7 +49,7 @@ public class NexusLogger extends Thread {
             }
         };
 
-        timer.schedule(flushTask, 0, 10000);
+        timer.scheduleAtFixedRate(flushTask, 0, 10000);
     }
 
     private void writeLog(String message) {
@@ -82,7 +82,7 @@ public class NexusLogger extends Thread {
     }
 
     private void logError(String message, LogType type) {
-        this.writeLog("%s [%s] [%s] %s\n".formatted(format.format(new Date()), LogLevel.WARNING, type.name(), message));
+        this.writeLog("%s [%s] [%s] %s\n".formatted(format.format(new Date()), LogLevel.ERROR, type.name(), message));
     }
 
     private void waitAndWrite(LogLevel level, String message) throws InterruptedException {

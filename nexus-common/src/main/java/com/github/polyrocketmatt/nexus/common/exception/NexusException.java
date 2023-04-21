@@ -8,7 +8,7 @@ public class NexusException extends RuntimeException {
     public NexusException(String message) {
         super(message);
 
-        if (!Nexus.getPlatform().getConfiguration().getBoolean("logging.suppress")) {
+        if (!Nexus.getPlatform().getConfiguration().getBoolean("debug")) {
             StringBuilder traceBuilder = new StringBuilder();
             for (StackTraceElement element : getStackTrace()) {
                 traceBuilder.append(element.toString());

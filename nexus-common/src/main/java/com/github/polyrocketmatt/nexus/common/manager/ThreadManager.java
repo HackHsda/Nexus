@@ -35,10 +35,29 @@ public class ThreadManager implements NexusManager {
         NexusLogger.inform("    Thread pool size: %s", NexusLogger.LogType.COMMON, maxThreadCount);
     }
 
+    @Override
+    public void close() {
+        int serviceCount = services.size();
+        services.forEach((service, threads) -> handleTermination(service, maxDefaultWait));
+
+        NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
+        NexusLogger.inform("    Forced Shutdown Count: %s", NexusLogger.LogType.COMMON, serviceCount);
+    }
+
+    @Override
+    public void log() {
+        NexusLogger.inform("Thread Manager", NexusLogger.LogType.COMMON);
+        NexusLogger.inform("--------------", NexusLogger.LogType.COMMON);
+        NexusLogger.inform("    Services: %s", NexusLogger.LogType.COMMON, services.size());
+        NexusLogger.inform("    Available Threads: %s", NexusLogger.LogType.COMMON, availableThreads);
+        NexusLogger.inform("    Max Thread Count: %s", NexusLogger.LogType.COMMON, maxThreadCount);
+        NexusLogger.inform("    Max Default Wait: %s", NexusLogger.LogType.COMMON, maxDefaultWait);
+        NexusLogger.inform("", NexusLogger.LogType.COMMON);
+    }
+
     public ExecutorService getService(int threadCount) {
         int grantedThreads = min(threadCount, availableThreads);
 
-        NexusLogger.inform("Service request -> %s threads (%s available)", NexusLogger.LogType.COMMON, grantedThreads, availableThreads);
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(grantedThreads);
         availableThreads -= grantedThreads;
         services.put(executor, grantedThreads);
@@ -62,20 +81,9 @@ public class ThreadManager implements NexusManager {
 
             //  Return the threads to the pool
             availableThreads += threadCount;
-
-            NexusLogger.inform("A service has been terminated, returned %s threads to the common pool", NexusLogger.LogType.COMMON, threadCount);
         } catch (InterruptedException ex) {
             throw new NexusThreadingException("Service interrupted while waiting for termination");
         }
-    }
-
-    @Override
-    public void close() {
-        int serviceCount = services.size();
-        services.forEach((service, threads) -> handleTermination(service, maxDefaultWait));
-
-        NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
-        NexusLogger.inform("    Forced Shutdown Count: %s", NexusLogger.LogType.COMMON, serviceCount);
     }
 
     public <T> void accept(Supplier<T> supplier, Consumer<T> consumer) {

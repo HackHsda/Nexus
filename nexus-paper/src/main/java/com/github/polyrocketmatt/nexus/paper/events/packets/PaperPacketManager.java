@@ -49,4 +49,9 @@ public class PaperPacketManager implements NexusManager {
     public void close() {
         handlers.forEach(this::unregister);
     }
+
+    @Override
+    public void log() {
+
+    }
 }

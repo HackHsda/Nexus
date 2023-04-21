@@ -1,98 +1,116 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
-import com.github.polyrocketmatt.nexus.api.events.InternalEventListener;
 import com.github.polyrocketmatt.nexus.api.events.ExternalEventListener;
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
 import com.github.polyrocketmatt.nexus.common.Nexus;
-import com.github.polyrocketmatt.nexus.common.exception.NexusEntityException;
+import com.github.polyrocketmatt.nexus.common.exception.NexusProcessingException;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.UUID;
 
 public class EventManager implements NexusManager {
 
     private final Set<ExternalEventListener> externalListeners;
-    private final Set<InternalEventListener> internalListeners;
-    private final Map<UUID, Queue<NexusEvent>> eventQueues;
+    private final Queue<NexusEvent> eventQueue;
+    private final Thread[] workers;
+    private final long eventWorkerTimeout;
 
     public EventManager() {
+        int workerCount = Integer.parseInt(Nexus.getProperties().getProperty("threading.event-workers"));
         this.externalListeners = new HashSet<>();
-        this.internalListeners = new HashSet<>();
-        this.eventQueues = new HashMap<>();
+        this.eventQueue = new LinkedList<>();
+        this.workers = new Thread[workerCount];
+        for (int i = 0; i < workerCount; i++) {
+            workers[i] = new Thread(new EventWorker(), "Nexus Worker %s".formatted(i));
+            workers[i].start();
+        }
+        this.eventWorkerTimeout = Long.parseLong(Nexus.getProperties().getProperty("threading.event-worker-timeout"));
 
         NexusLogger.inform("Initialised %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
     @Override
     public void close() {
-        this.externalListeners.clear();
-        this.internalListeners.clear();
+        externalListeners.clear();
 
         NexusLogger.inform("Closed %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
 
-    public void registerInternalListener(@NotNull InternalEventListener listener) {
-        this.internalListeners.add(listener);
-
-        NexusLogger.inform("Registered internal listener: %s", NexusLogger.LogType.COMMON, listener.getClass().getSimpleName());
+    @Override
+    public void log() {
+        NexusLogger.inform("Event Manager", NexusLogger.LogType.COMMON);
+        NexusLogger.inform("-------------", NexusLogger.LogType.COMMON);
+        NexusLogger.inform("    External Listeners: %s", NexusLogger.LogType.COMMON, externalListeners.size());
+        NexusLogger.inform("    Event Queues: %s", NexusLogger.LogType.COMMON, eventQueue.size());
+        NexusLogger.inform("    Workers: %s", NexusLogger.LogType.COMMON, workers.length);
+        NexusLogger.inform("", NexusLogger.LogType.COMMON);
     }
 
     public void registerExternalListener(@NotNull ExternalEventListener listener) {
-        this.externalListeners.add(listener);
-
-        NexusLogger.inform("Registered external listener: %s", NexusLogger.LogType.COMMON, listener.getClass().getSimpleName());
+        externalListeners.add(listener);
     }
 
-    public void dispatch(@NotNull NexusEvent event) {
-        Nexus.getThreadManager().submit(() -> {
-            internalListeners.forEach(listener -> listener.handle(event));
-            enqueue(event.getUniqueId(), event);
-        });
+    public synchronized void dispatch(@NotNull NexusEvent event) {
+        eventQueue.offer(event);
+        notifyAll();
     }
 
-    public void initialiseEventQueue(@NotNull UUID uuid) {
-        if (eventQueues.containsKey(uuid))
-            return;
-        eventQueues.put(uuid, new LinkedList<>());
-    }
+    private class EventWorker implements Runnable {
 
-    public void removeEventQueue(@NotNull UUID uuid) {
-        if (!eventQueues.containsKey(uuid))
-            return;
-        eventQueues.remove(uuid);
-    }
+        @Override
+        public void run() {
+            while (true) {
+                //  Acquire lock on event queue
+                synchronized (EventManager.this) {
+                    while (eventQueue.isEmpty()) {
+                        try {
+                            EventManager.this.wait();
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
 
-    public void enqueue(@NotNull UUID uuid, @NotNull NexusEvent event) {
-        if (!eventQueues.containsKey(uuid))
-            throw new NexusEntityException("Player with UUID: %s does not exist!".formatted(uuid));
-        eventQueues.get(uuid).add(event);
+                            return;
+                        }
+                    }
 
-        //  Reschedule processing task
-        if (!Nexus.getTaskManager().taskIsRunning(uuid))
-            Nexus.getTaskManager().rescheduleTask(uuid);
-        NexusLogger.inform("Enqueued event: %s for UUID %s", NexusLogger.LogType.COMMON, event.getClass().getSimpleName(), uuid.toString());
-        NexusLogger.inform("    Event Handle: %s", NexusLogger.LogType.COMMON, event.getModuleHandle());
-    }
+                    var event = eventQueue.poll();
 
-    public @Nullable NexusEvent deque(@NotNull UUID uuid) {
-        if (!eventQueues.containsKey(uuid))
-            throw new NexusEntityException("Player with UUID: %s does not exist!".formatted(uuid));
-        return eventQueues.get(uuid).poll();
-    }
+                    NexusLogger.inform("Worker %s is processing event %s", NexusLogger.LogType.COMMON, Thread.currentThread().getName(), event.getClass().getSimpleName());
 
-    public int getQueueSize(@NotNull UUID uuid) {
-        if (!eventQueues.containsKey(uuid))
-            throw new NexusEntityException("Player with UUID: %s does not exist!".formatted(uuid));
-        return eventQueues.get(uuid).size();
+                    var player = Nexus.getPlayerManager().getPlayer(event.getUniqueId());
+                    var module = Nexus.getModuleManager().getModule(event.getModuleHandle());
+                    if (player == null || module == null) {
+                        try {
+                            Thread.sleep(eventWorkerTimeout);
+
+                            dispatch(event);
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                            NexusLogger.warn("Worker %s interrupted!", NexusLogger.LogType.COMMON, Thread.currentThread().getName());
+
+                            return;
+                        }
+
+                        NexusLogger.warn("Worker %s could not find player or module for event %s", NexusLogger.LogType.COMMON, Thread.currentThread().getName(), event.getClass().getSimpleName());
+
+                        return;
+                    }
+
+                    var handler = module.getModuleHandler(Nexus.getPlatform().getPlatformType());
+                    if (handler != null)
+                        try {
+                            handler.process(event, player);
+                        } catch (Exception ex) {
+                            throw new NexusProcessingException("Could not process event %s".formatted(event.getClass().getSimpleName()), ex);
+                        }
+                }
+            }
+        }
+
     }
 
 }

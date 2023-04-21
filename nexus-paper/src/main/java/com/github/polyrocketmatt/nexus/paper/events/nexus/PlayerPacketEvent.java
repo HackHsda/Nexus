@@ -1,6 +1,5 @@
 package com.github.polyrocketmatt.nexus.paper.events.nexus;
 
-import com.comphenix.protocol.events.PacketEvent;
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 
@@ -8,11 +7,13 @@ import java.util.UUID;
 
 public class PlayerPacketEvent extends NexusEvent {
 
-    private final PacketEvent event;
+    private final String channel;
+    private final String message;
 
-    public PlayerPacketEvent(UUID uuid, PacketEvent event) {
+    public PlayerPacketEvent(UUID uuid, String channel, String message) {
         super(uuid);
-        this.event = event;
+        this.channel = channel;
+        this.message = message;
     }
 
     @Override
@@ -20,7 +21,11 @@ public class PlayerPacketEvent extends NexusEvent {
         return NexusModuleType.CLIENT_DETECTION;
     }
 
-    public PacketEvent getEvent() {
-        return event;
+    public String getChannel() {
+        return channel;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

@@ -39,16 +39,8 @@ public class PaperCustomPayloadHandler extends ModuleHandler {
             return;
         if (!(entity instanceof NexusPlayer player))
             return;
-
-        PacketContainer packet = event.getEvent().getPacket();
-        StructureModifier<MinecraftKey> keys = packet.getMinecraftKeys();
-        StructureModifier<Object> modifier = packet.getModifier();
-        String channel = keys.read(0).getFullKey();
-        String message = ((ByteBuf) modifier.read(1)).toString(StandardCharsets.UTF_8);
-
-        System.out.println("Channel: " + channel);
-        System.out.println("Message: " + message);
-        System.out.println("Keys: " + packet.getMinecraftKeys().size());
+        String channel = event.getChannel();
+        String message = event.getMessage();
 
         //  Pass the packet information to the client detection module
         Pair<Boolean, String> detectionResult = PaperNexus.getInstance().<ClientDetectionModule>getModule(NexusModuleType.CLIENT_DETECTION)

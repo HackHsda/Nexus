@@ -7,7 +7,6 @@ import com.github.polyrocketmatt.nexus.common.manager.EventManager;
 import com.github.polyrocketmatt.nexus.common.manager.MetricsManager;
 import com.github.polyrocketmatt.nexus.common.manager.ModuleManager;
 import com.github.polyrocketmatt.nexus.common.manager.PlayerManager;
-import com.github.polyrocketmatt.nexus.common.manager.TaskManager;
 import com.github.polyrocketmatt.nexus.common.manager.ThreadManager;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import com.github.polyrocketmatt.nexus.common.utils.ResourceLoader;
@@ -34,7 +33,6 @@ public class Nexus {
     private ModuleManager moduleManager;
     private PlayerManager playerManager;
     private ThreadManager threadManager;
-    private TaskManager taskManager;
 
     private Nexus() {
         this.platform = null;
@@ -57,14 +55,12 @@ public class Nexus {
         INSTANCE.moduleManager = new ModuleManager();
         INSTANCE.playerManager = new PlayerManager();
         INSTANCE.threadManager = new ThreadManager();
-        INSTANCE.taskManager = new TaskManager();
 
         //  Add all managers
         INSTANCE.managers.add(INSTANCE.eventManager);
         INSTANCE.managers.add(INSTANCE.moduleManager);
         INSTANCE.managers.add(INSTANCE.playerManager);
         INSTANCE.managers.add(INSTANCE.threadManager);
-        INSTANCE.managers.add(INSTANCE.taskManager);
 
         NexusLogger.inform("Nexus loaded successfully for platform: %s", NexusLogger.LogType.COMMON, platform.getPlatformType().name());
     }
@@ -129,7 +125,4 @@ public class Nexus {
         return checkInitialised(INSTANCE.threadManager);
     }
 
-    public static @NotNull TaskManager getTaskManager() {
-        return checkInitialised(INSTANCE.taskManager);
-    }
 }

@@ -1,10 +1,8 @@
 package com.github.polyrocketmatt.nexus.common.entity;
 
 import com.github.polyrocketmatt.nexus.api.entity.NexusEntity;
-import com.github.polyrocketmatt.nexus.api.scheduling.NexusTask;
 import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.client.NexusPlayerStatusClient;
-import com.github.polyrocketmatt.nexus.common.exception.NexusModuleException;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,12 +26,6 @@ public abstract class NexusPlayer implements NexusEntity {
             NexusLogger.inform("    UUID: %s", NexusLogger.LogType.COMMON, uuid.toString());
             NexusLogger.inform("    Data: %s", NexusLogger.LogType.COMMON, data.data());
         });
-
-        schedulePlayerEventHandling();
-    }
-
-    private void schedulePlayerEventHandling() {
-        Nexus.getTaskManager().scheduleTaskAtFixedRate(new PlayerEventHandlingTask(this, 5000));
     }
 
     public UUID getUniqueId() {
@@ -45,39 +37,5 @@ public abstract class NexusPlayer implements NexusEntity {
     }
 
     public abstract void sendMessage(@NotNull String message);
-
-    private static class PlayerEventHandlingTask extends NexusTask {
-
-        private final NexusPlayer player;
-        private final UUID uuid;
-
-        public PlayerEventHandlingTask(NexusPlayer player, long period) {
-            super(player.getUniqueId(), 0L, period);
-
-            this.player = player;
-            this.uuid = player.getUniqueId();
-        }
-
-        @Override
-        public void run() {
-            Nexus.getThreadManager().submit(() -> {
-                var event = Nexus.getEventManager().deque(uuid);
-                while (event != null) {
-                    //  Get the appropriate module that handles this event
-                    var module = Nexus.getModuleManager().getModule(event.getModuleHandle());
-                    if (module == null)
-                        throw new NexusModuleException("Module %s does not exist", event.getModuleHandle());
-                    var handler = module.getModuleHandler(Nexus.getPlatform().getPlatformType());
-                    if (handler != null)
-                        handler.process(event, player);
-                    event = Nexus.getEventManager().deque(uuid);
-                }
-
-                //  If no more tasks, cancel this task
-                //Nexus.getTaskManager().cancelTask(uuid);
-            });
-        }
-
-    }
 
 }
