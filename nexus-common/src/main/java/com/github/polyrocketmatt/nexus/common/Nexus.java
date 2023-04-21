@@ -129,4 +129,8 @@ public class Nexus {
         return checkInitialised(INSTANCE.threadManager);
     }
 
+    public static @NotNull CommandManager getCommandManager() {
+        return checkInitialised(INSTANCE.commandManager);
+    }
+
 }

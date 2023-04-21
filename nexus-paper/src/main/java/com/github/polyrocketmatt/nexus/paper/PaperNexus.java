@@ -2,12 +2,14 @@ package com.github.polyrocketmatt.nexus.paper;
 
 import com.github.polyrocketmatt.nexus.api.NexusPlatform;
 import com.github.polyrocketmatt.nexus.api.PlatformType;
+import com.github.polyrocketmatt.nexus.api.entity.NexusCommunicativeEntity;
 import com.github.polyrocketmatt.nexus.api.events.ExternalEventListener;
 import com.github.polyrocketmatt.nexus.api.metrics.NexusMetrics;
 import com.github.polyrocketmatt.nexus.api.module.ModuleProcessor;
 import com.github.polyrocketmatt.nexus.api.module.NexusModule;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.Nexus;
+import com.github.polyrocketmatt.nexus.common.entity.NexusConsole;
 import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.common.exception.NexusException;
 import com.github.polyrocketmatt.nexus.common.exception.NexusModuleException;
@@ -24,6 +26,8 @@ import com.github.polyrocketmatt.nexus.paper.events.packets.listeners.PaperCusto
 import com.github.polyrocketmatt.nexus.paper.events.packets.PaperPacketManager;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +46,7 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
     private YamlDocument configuration;
     private YamlDocument messages;
     private PaperPacketManager packetManager;
+    private final NexusConsole console = new NexusConsole();
 
     public PaperNexus() { instance = this; }
 
@@ -95,6 +100,15 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
         NexusLogger.inform("Disabling Nexus: Paper", NexusLogger.LogType.PLATFORM);
         Nexus.unload();
         NexusLogger.shutdown();
+    }
+
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        //  Forward to Nexus
+        NexusCommunicativeEntity commander = (sender instanceof Player) ? getPlayer(((Player) sender).getUniqueId()) : console;
+        Nexus.getCommandManager().processCommand(commander, command.getName(), args);
+
+        return true;
     }
 
     @Override
@@ -205,4 +219,5 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
 
         YamlDocManager.save(configuration);
     }
+
 }

@@ -1,6 +1,6 @@
 package com.github.polyrocketmatt.nexus.common.command;
 
-import com.github.polyrocketmatt.nexus.api.entity.NexusEntity;
+import com.github.polyrocketmatt.nexus.api.entity.NexusCommunicativeEntity;
 
 public abstract class NexusCommand {
 
@@ -36,6 +36,6 @@ public abstract class NexusCommand {
         return "/%s %s - %s".formatted(name, String.join(" ", arguments), description);
     }
 
-    public abstract void run(NexusEntity executor, String[] args) throws Exception;
+    public abstract void run(NexusCommunicativeEntity commander, String[] args) throws Exception;
 
 }

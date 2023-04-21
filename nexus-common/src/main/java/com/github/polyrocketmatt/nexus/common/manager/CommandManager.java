@@ -1,8 +1,8 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
+import com.github.polyrocketmatt.nexus.api.entity.NexusCommunicativeEntity;
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
 import com.github.polyrocketmatt.nexus.common.command.NexusCommand;
-import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 
 import java.util.Arrays;
@@ -34,7 +34,7 @@ public class CommandManager implements NexusManager {
         return this;
     }
 
-    public void processCommand(NexusPlayer commander, String command, String[] args) {
+    public void processCommand(NexusCommunicativeEntity commander, String command, String[] args) {
         if (command.equalsIgnoreCase("sierra")) {
             if (args.length == 0) {
                 commander.sendMessage("&bNexus Commands");

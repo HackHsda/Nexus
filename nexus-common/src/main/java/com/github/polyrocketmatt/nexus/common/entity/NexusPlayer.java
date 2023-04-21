@@ -1,6 +1,6 @@
 package com.github.polyrocketmatt.nexus.common.entity;
 
-import com.github.polyrocketmatt.nexus.api.entity.NexusEntity;
+import com.github.polyrocketmatt.nexus.api.entity.NexusCommunicativeEntity;
 import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.client.NexusPlayerStatusClient;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public abstract class NexusPlayer implements NexusEntity {
+public abstract class NexusPlayer implements NexusCommunicativeEntity {
 
     protected final UUID uuid;
     protected NexusPlayerData playerData;
@@ -35,8 +35,6 @@ public abstract class NexusPlayer implements NexusEntity {
     public NexusPlayerData getPlayerData() {
         return playerData;
     }
-
-    public abstract void sendMessage(@NotNull String message);
 
     public abstract boolean hasPermission(@NotNull String permission);
 
