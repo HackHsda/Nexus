@@ -1,4 +1,4 @@
-package com.github.polyrocketmatt.nexus.paper.events.nexus;
+package com.github.polyrocketmatt.nexus.common.event;
 
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
@@ -35,4 +35,9 @@ public class PlayerConnectEvent extends NexusEvent {
     public InetAddress getAddress() {
         return address;
     }
+
+    public boolean isLocal() {
+        return address.getHostAddress().startsWith("0:0:0:0") || address.getHostAddress().startsWith("0:0:0:0:0:0:1");
+    }
+
 }

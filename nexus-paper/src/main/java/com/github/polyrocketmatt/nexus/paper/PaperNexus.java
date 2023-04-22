@@ -14,12 +14,14 @@ import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.common.exception.NexusException;
 import com.github.polyrocketmatt.nexus.common.exception.NexusModuleException;
 import com.github.polyrocketmatt.nexus.common.manager.MetricsManager;
+import com.github.polyrocketmatt.nexus.common.modules.ClientConnectionModule;
 import com.github.polyrocketmatt.nexus.common.modules.ClientDetectionModule;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import com.github.polyrocketmatt.nexus.common.utils.ResourceLoader;
 import com.github.polyrocketmatt.nexus.common.utils.YamlDocManager;
 import com.github.polyrocketmatt.nexus.paper.entity.PaperNexusPlayer;
 import com.github.polyrocketmatt.nexus.paper.events.bukkit.listeners.PaperConnectionListener;
+import com.github.polyrocketmatt.nexus.paper.handlers.PaperConnectionHandler;
 import com.github.polyrocketmatt.nexus.paper.handlers.PaperCustomPayloadHandler;
 import com.github.polyrocketmatt.nexus.paper.metrics.PaperMetrics;
 import com.github.polyrocketmatt.nexus.paper.events.packets.listeners.PaperCustomPayloadListener;
@@ -85,8 +87,10 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
         registerListener(new PaperConnectionListener());
 
         //  Initialize Nexus Modules
-        if (configuration.getBoolean("modules.client-detection.enabled"))
+        if (configuration.getBoolean("modules.client-detection.enabled")) {
             registerModule(new ClientDetectionModule(), new PaperCustomPayloadHandler());
+            registerModule(new ClientConnectionModule(), new PaperConnectionHandler());
+        }
 
         //  Initialize Packet Protocols
         packetManager.register(new PaperCustomPayloadListener());
@@ -214,10 +218,13 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
 
     private void install() {
         YamlDocument localConfig = YamlDocManager.from(ResourceLoader.getResource("config.yml"), "config.yml");
+        YamlDocument localMessages = YamlDocManager.from(ResourceLoader.getResource("messages.yml"), "messages.yml");
 
         localConfig.getKeys().forEach(key -> configuration.set((String) key, localConfig.get((String) key)));
+        localMessages.getKeys().forEach(key -> messages.set((String) key, localMessages.get((String) key)));
 
         YamlDocManager.save(configuration);
+        YamlDocManager.save(messages);
     }
 
 }

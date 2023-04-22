@@ -1,9 +1,10 @@
 package com.github.polyrocketmatt.nexus.paper.events.bukkit.listeners;
 
+import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
 import com.github.polyrocketmatt.nexus.paper.PaperNexus;
 import com.github.polyrocketmatt.nexus.paper.events.bukkit.PaperListener;
-import com.github.polyrocketmatt.nexus.paper.events.nexus.PlayerConnectEvent;
+import com.github.polyrocketmatt.nexus.common.event.PlayerConnectEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -29,8 +30,8 @@ public class PaperConnectionListener extends PaperListener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onLogin(PlayerLoginEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
-        NexusPlayer player = PaperNexus.getInstance().getPlayer(uuid);
         PlayerConnectEvent nexusEvent = new PlayerConnectEvent(uuid, event.getPlayer().getName(), event.getHostname(), event.getAddress());
+        Nexus.getEventManager().dispatch(nexusEvent);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
 import com.github.polyrocketmatt.nexus.api.events.ExternalEventListener;
+import com.github.polyrocketmatt.nexus.api.events.InternalEventListener;
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
 import com.github.polyrocketmatt.nexus.common.Nexus;
@@ -16,6 +17,7 @@ import java.util.Set;
 public class EventManager implements NexusManager {
 
     private final Set<ExternalEventListener> externalListeners;
+    private final Set<InternalEventListener> internalListeners;
     private final Queue<NexusEvent> eventQueue;
     private final Thread[] workers;
     private final long eventWorkerTimeout;
@@ -23,6 +25,7 @@ public class EventManager implements NexusManager {
     public EventManager() {
         int workerCount = Integer.parseInt(Nexus.getProperties().getProperty("threading.event-workers"));
         this.externalListeners = new HashSet<>();
+        this.internalListeners = new HashSet<>();
         this.eventQueue = new LinkedList<>();
         this.workers = new Thread[workerCount];
         for (int i = 0; i < workerCount; i++) {
@@ -55,8 +58,13 @@ public class EventManager implements NexusManager {
         externalListeners.add(listener);
     }
 
+    public void registerInternalListener(@NotNull InternalEventListener listener) {
+        internalListeners.add(listener);
+    }
+
     public synchronized void dispatch(@NotNull NexusEvent event) {
         eventQueue.offer(event);
+        internalListeners.forEach(listener -> listener.handle(event));
         notifyAll();
     }
 
@@ -83,7 +91,7 @@ public class EventManager implements NexusManager {
 
                     var player = Nexus.getPlayerManager().getPlayer(event.getUniqueId());
                     var module = Nexus.getModuleManager().getModule(event.getModuleHandle());
-                    if (player == null || module == null) {
+                    if (player == null || module == null || player.getPlayerData() == null) {
                         try {
                             Thread.sleep(eventWorkerTimeout);
 

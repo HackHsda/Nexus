@@ -10,7 +10,7 @@ import com.comphenix.protocol.wrappers.MinecraftKey;
 import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.paper.PaperNexus;
 import com.github.polyrocketmatt.nexus.paper.events.packets.PaperPacketListener;
-import com.github.polyrocketmatt.nexus.paper.events.nexus.PlayerPacketEvent;
+import com.github.polyrocketmatt.nexus.common.event.PlayerPacketEvent;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;

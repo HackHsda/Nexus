@@ -9,7 +9,7 @@ import com.github.polyrocketmatt.nexus.common.modules.ClientDetectionModule;
 import com.github.polyrocketmatt.nexus.common.modules.ModuleHandler;
 import com.github.polyrocketmatt.nexus.common.utils.Pair;
 import com.github.polyrocketmatt.nexus.paper.PaperNexus;
-import com.github.polyrocketmatt.nexus.paper.events.nexus.PlayerPacketEvent;
+import com.github.polyrocketmatt.nexus.common.event.PlayerPacketEvent;
 
 import java.util.Set;
 

@@ -35,7 +35,7 @@ public class CommandManager implements NexusManager {
     }
 
     public void processCommand(NexusCommunicativeEntity commander, String command, String[] args) {
-        if (command.equalsIgnoreCase("sierra")) {
+        if (command.equalsIgnoreCase("nexus") || command.equalsIgnoreCase("nx")) {
             if (args.length == 0) {
                 commander.sendMessage("&bNexus Commands");
 

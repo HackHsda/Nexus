@@ -1,4 +1,4 @@
-package com.github.polyrocketmatt.nexus.paper.events.nexus;
+package com.github.polyrocketmatt.nexus.common.event;
 
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
 import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;

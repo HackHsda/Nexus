@@ -4,7 +4,7 @@ import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
 
 import java.util.UUID;
 
-public abstract class NexusEvent {
+public abstract class NexusEvent implements InternalNexusEvent {
 
     private final UUID uuid;
 

@@ -21,10 +21,11 @@ public class NexusPlayerStatusClient extends NexusClient {
 
     @Override
     public <T> @NotNull T get(@NotNull Class<T> clazz) {
+        String uuid = player.getUniqueId().toString();
+        String ip = player.getIpAddress();
+
         try {
-            HttpRequest request = construct(Endpoint.USER, Method.GET, "")
-                    .header("Authorization", player.getUniqueId().toString())
-                    .build();
+            HttpRequest request = construct(Endpoint.USER, Method.GET, "", uuid, ip).build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             NexusLogger.inform("Sending GET request to %s", NexusLogger.LogType.COMMON,  request.uri().toString());
             NexusLogger.inform("Response: %s", NexusLogger.LogType.COMMON, response.body());

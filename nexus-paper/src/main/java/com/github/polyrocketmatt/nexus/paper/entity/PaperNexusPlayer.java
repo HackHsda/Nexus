@@ -6,13 +6,17 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class PaperNexusPlayer extends NexusPlayer {
 
     private final Player player;
 
     public PaperNexusPlayer(Player player) {
-        super(player.getUniqueId());
+        super(player.getUniqueId(), Objects.requireNonNull(player.getAddress().getAddress().getHostAddress()));
         this.player = player;
+
+        System.out.println("Address: " + player.getAddress().toString());
     }
 
     @Override

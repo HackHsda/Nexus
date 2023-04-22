@@ -43,25 +43,38 @@ public abstract class NexusClient {
     public NexusClient() {
         this.url = "https://nexus-vercel-theta.vercel.app/gateway"; //Nexus.getProperties().getProperty("network.rest.url");
         this.client = HttpClient.newHttpClient();
-
-        //NexusLogger.inform("A new client has been configured with the following parameters:", NexusLogger.LogType.COMMON);
-        //NexusLogger.inform("    URL: %s".formatted(this.url), NexusLogger.LogType.COMMON);
     }
 
-    protected @NotNull HttpRequest.Builder construct(@NotNull Endpoint endpoint, @NotNull Method method, @Nullable String body) {
+    protected @NotNull HttpRequest.Builder construct(@NotNull Endpoint endpoint, @NotNull Method method,
+                                                     @Nullable String body, @NotNull String... params) {
         try {
             HttpRequest.Builder builder = HttpRequest.newBuilder()
                     .header("Content-Type", "application/json")
                     .timeout(Duration.ofSeconds(30));
 
+            //  Construct the URI
+            String operation = switch (method) {
+                case GET -> "get";
+                case POST -> "post";
+                case PUT -> "put";
+                case DELETE -> "delete";
+            };
+
+            StringBuilder uri = new StringBuilder("%s/%s/%s".formatted(url, endpoint.endpoint, operation));
+            if (params.length == 0)
+                uri.append("/");
+            else
+                for (String param : params)
+                    uri.append("/%s".formatted(param));
+
             switch (method) {
-                case GET        -> builder.GET().uri(new URI("%s/%s/%s".formatted(url, endpoint.endpoint, "get/")));
-                case POST       -> builder.POST(bodyPublisher(body)).uri(new URI("%s/%s".formatted(url, "post/")));
-                case PUT        -> builder.PUT(bodyPublisher(body)).uri(new URI("%s/%s".formatted(url, "put/")));
-                case DELETE     -> builder.DELETE().uri(new URI("%s/%s".formatted(url, "delete/")));
+                case GET        -> builder.GET();
+                case POST       -> builder.POST(bodyPublisher(body));
+                case PUT        -> builder.PUT(bodyPublisher(body));
+                case DELETE     -> builder.DELETE();
             }
 
-            return builder;
+            return builder.uri(new URI(uri.toString()));
         } catch (URISyntaxException ex) {
             throw new NexusClientException("Failed to construct GET request", url, Method.GET);
         }
