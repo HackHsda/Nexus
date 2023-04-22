@@ -1,10 +1,13 @@
-package com.github.polyrocketmatt.nexus.api.module;
+package com.github.polyrocketmatt.nexus.api.modules;
 
 public enum NexusModuleType {
 
     //  Modules used to handle player connection events
     CLIENT_DETECTION("client-detection"),
-    CLIENT_CONNECTION("client-connection");
+    CLIENT_CONNECTION("client-connection"),
+    MOD_DETECTION("mod-detection"),
+    PACKET_TRACER("packet-tracer")
+    ;
 
     private final String key;
 

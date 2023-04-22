@@ -1,6 +1,6 @@
 package com.github.polyrocketmatt.nexus.common.exception;
 
-import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
+import com.github.polyrocketmatt.nexus.api.modules.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 

@@ -109,9 +109,10 @@ public class EventManager implements NexusManager {
                     }
 
                     var handler = module.getModuleHandler(Nexus.getPlatform().getPlatformType());
+                    var result = module.process(player, event);
                     if (handler != null)
                         try {
-                            handler.process(event, player);
+                            handler.handle(result);
                         } catch (Exception ex) {
                             throw new NexusProcessingException("Could not process event %s".formatted(event.getClass().getSimpleName()), ex);
                         }

@@ -45,6 +45,11 @@ project. The following is a list of items that are currently not open source:
 This is to ensure the integrity of the models and the security of the configuration. It 
 also prevents from blatant stealing of the models and configuration files.
 
+## Features
+
+- Client Detection (Fabric, Forge)
+- Untrusted IP Detection (VPN, Proxy, Tor, etc.)
+
 ---
 
 <h5 align="center">Icons provided by <a href="https://www.flaticon.com/">Flaticon</a></h5>

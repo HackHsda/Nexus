@@ -1,7 +1,7 @@
 package com.github.polyrocketmatt.nexus.common.event;
 
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
-import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
+import com.github.polyrocketmatt.nexus.api.modules.NexusModuleType;
 
 import java.net.InetAddress;
 import java.util.UUID;

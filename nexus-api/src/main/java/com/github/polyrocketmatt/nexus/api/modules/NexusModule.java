@@ -1,6 +1,8 @@
-package com.github.polyrocketmatt.nexus.api.module;
+package com.github.polyrocketmatt.nexus.api.modules;
 
 import com.github.polyrocketmatt.nexus.api.PlatformType;
+import com.github.polyrocketmatt.nexus.api.entity.NexusEntity;
+import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +18,8 @@ public abstract class NexusModule {
     }
 
     public abstract @NotNull NexusModuleType getModuleType();
+
+    public abstract @NotNull ModuleProcessResult process(@NotNull NexusEntity nexusEntity, @NotNull NexusEvent nexusEvent);
 
     public @Nullable ModuleProcessor getModuleHandler(PlatformType type) {
         for (ModuleProcessor handler : handlers)

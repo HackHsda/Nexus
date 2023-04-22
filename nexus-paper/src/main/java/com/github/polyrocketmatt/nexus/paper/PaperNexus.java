@@ -5,9 +5,9 @@ import com.github.polyrocketmatt.nexus.api.PlatformType;
 import com.github.polyrocketmatt.nexus.api.entity.NexusCommunicativeEntity;
 import com.github.polyrocketmatt.nexus.api.events.ExternalEventListener;
 import com.github.polyrocketmatt.nexus.api.metrics.NexusMetrics;
-import com.github.polyrocketmatt.nexus.api.module.ModuleProcessor;
-import com.github.polyrocketmatt.nexus.api.module.NexusModule;
-import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
+import com.github.polyrocketmatt.nexus.api.modules.ModuleProcessor;
+import com.github.polyrocketmatt.nexus.api.modules.NexusModule;
+import com.github.polyrocketmatt.nexus.api.modules.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.entity.NexusConsole;
 import com.github.polyrocketmatt.nexus.common.entity.NexusPlayer;
@@ -16,13 +16,15 @@ import com.github.polyrocketmatt.nexus.common.exception.NexusModuleException;
 import com.github.polyrocketmatt.nexus.common.manager.MetricsManager;
 import com.github.polyrocketmatt.nexus.common.modules.ClientConnectionModule;
 import com.github.polyrocketmatt.nexus.common.modules.ClientDetectionModule;
+import com.github.polyrocketmatt.nexus.common.modules.ModDetectionModule;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import com.github.polyrocketmatt.nexus.common.utils.ResourceLoader;
 import com.github.polyrocketmatt.nexus.common.utils.YamlDocManager;
 import com.github.polyrocketmatt.nexus.paper.entity.PaperNexusPlayer;
 import com.github.polyrocketmatt.nexus.paper.events.bukkit.listeners.PaperConnectionListener;
+import com.github.polyrocketmatt.nexus.paper.handlers.PaperClientDetectionHandler;
 import com.github.polyrocketmatt.nexus.paper.handlers.PaperConnectionHandler;
-import com.github.polyrocketmatt.nexus.paper.handlers.PaperCustomPayloadHandler;
+import com.github.polyrocketmatt.nexus.paper.handlers.PaperModDetectionHandler;
 import com.github.polyrocketmatt.nexus.paper.metrics.PaperMetrics;
 import com.github.polyrocketmatt.nexus.paper.events.packets.listeners.PaperCustomPayloadListener;
 import com.github.polyrocketmatt.nexus.paper.events.packets.PaperPacketManager;
@@ -88,8 +90,9 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
 
         //  Initialize Nexus Modules
         if (configuration.getBoolean("modules.client-detection.enabled")) {
-            registerModule(new ClientDetectionModule(), new PaperCustomPayloadHandler());
+            registerModule(new ClientDetectionModule(), new PaperClientDetectionHandler());
             registerModule(new ClientConnectionModule(), new PaperConnectionHandler());
+            registerModule(new ModDetectionModule(), new PaperModDetectionHandler());
         }
 
         //  Initialize Packet Protocols

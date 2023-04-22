@@ -1,6 +1,6 @@
 package com.github.polyrocketmatt.nexus.api.events;
 
-import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
+import com.github.polyrocketmatt.nexus.api.modules.NexusModuleType;
 
 import java.util.UUID;
 

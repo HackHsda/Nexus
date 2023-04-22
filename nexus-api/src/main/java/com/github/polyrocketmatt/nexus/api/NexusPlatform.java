@@ -3,9 +3,9 @@ package com.github.polyrocketmatt.nexus.api;
 import com.github.polyrocketmatt.nexus.api.entity.NexusEntity;
 import com.github.polyrocketmatt.nexus.api.events.ExternalEventListener;
 import com.github.polyrocketmatt.nexus.api.metrics.NexusMetrics;
-import com.github.polyrocketmatt.nexus.api.module.ModuleProcessor;
-import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
-import com.github.polyrocketmatt.nexus.api.module.NexusModule;
+import com.github.polyrocketmatt.nexus.api.modules.ModuleProcessor;
+import com.github.polyrocketmatt.nexus.api.modules.NexusModuleType;
+import com.github.polyrocketmatt.nexus.api.modules.NexusModule;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.jetbrains.annotations.NotNull;
 

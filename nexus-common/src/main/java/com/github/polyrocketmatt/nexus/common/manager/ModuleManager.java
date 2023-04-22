@@ -1,9 +1,9 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
-import com.github.polyrocketmatt.nexus.api.module.ModuleProcessor;
-import com.github.polyrocketmatt.nexus.api.module.NexusModule;
-import com.github.polyrocketmatt.nexus.api.module.NexusModuleType;
+import com.github.polyrocketmatt.nexus.api.modules.ModuleProcessor;
+import com.github.polyrocketmatt.nexus.api.modules.NexusModule;
+import com.github.polyrocketmatt.nexus.api.modules.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.exception.NexusModuleException;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
 import org.jetbrains.annotations.Nullable;
