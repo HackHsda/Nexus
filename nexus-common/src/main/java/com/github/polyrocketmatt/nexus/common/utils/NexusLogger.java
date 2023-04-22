@@ -52,7 +52,7 @@ public class NexusLogger extends Thread {
         timer.scheduleAtFixedRate(flushTask, 0, 10000);
     }
 
-    private void writeLog(String message) {
+    private synchronized void writeLog(String message) {
         try {
             writer.write(message);
             writer.flush();

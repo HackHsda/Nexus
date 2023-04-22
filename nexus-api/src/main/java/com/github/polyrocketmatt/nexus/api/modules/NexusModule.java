@@ -17,6 +17,8 @@ public abstract class NexusModule {
         this.handlers = new HashSet<>();
     }
 
+    public abstract @NotNull Set<Class<?>> getObservedEvents();
+
     public abstract @NotNull NexusModuleType getModuleType();
 
     public abstract @NotNull ModuleProcessResult process(@NotNull NexusEntity nexusEntity, @NotNull NexusEvent nexusEvent);

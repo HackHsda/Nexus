@@ -89,11 +89,10 @@ public class PaperNexus extends JavaPlugin implements NexusPlatform {
         registerListener(new PaperConnectionListener());
 
         //  Initialize Nexus Modules
-        if (configuration.getBoolean("modules.client-detection.enabled")) {
-            registerModule(new ClientDetectionModule(), new PaperClientDetectionHandler());
-            registerModule(new ClientConnectionModule(), new PaperConnectionHandler());
-            registerModule(new ModDetectionModule(), new PaperModDetectionHandler());
-        }
+        //  TODO: Allow for opt-in/out of modules
+        registerModule(new ClientDetectionModule(), new PaperClientDetectionHandler());
+        registerModule(new ClientConnectionModule(), new PaperConnectionHandler());
+        registerModule(new ModDetectionModule(), new PaperModDetectionHandler());
 
         //  Initialize Packet Protocols
         packetManager.register(new PaperCustomPayloadListener());

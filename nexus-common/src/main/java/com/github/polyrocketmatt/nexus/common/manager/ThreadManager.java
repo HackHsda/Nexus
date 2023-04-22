@@ -81,6 +81,7 @@ public class ThreadManager implements NexusManager {
 
             //  Return the threads to the pool
             availableThreads += threadCount;
+            services.remove(service);
         } catch (InterruptedException ex) {
             throw new NexusThreadingException("Service interrupted while waiting for termination");
         }

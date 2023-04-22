@@ -1,7 +1,6 @@
 package com.github.polyrocketmatt.nexus.common.event;
 
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
-import com.github.polyrocketmatt.nexus.api.modules.NexusModuleType;
 
 import java.net.InetAddress;
 import java.util.UUID;
@@ -17,11 +16,6 @@ public class PlayerConnectEvent extends NexusEvent {
         this.name = name;
         this.host = host;
         this.address = address;
-    }
-
-    @Override
-    public NexusModuleType getModuleHandle() {
-        return NexusModuleType.CLIENT_CONNECTION;
     }
 
     public String getName() {

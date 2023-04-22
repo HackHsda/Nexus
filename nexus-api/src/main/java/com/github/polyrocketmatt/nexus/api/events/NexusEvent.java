@@ -1,7 +1,5 @@
 package com.github.polyrocketmatt.nexus.api.events;
 
-import com.github.polyrocketmatt.nexus.api.modules.NexusModuleType;
-
 import java.util.UUID;
 
 public abstract class NexusEvent implements InternalNexusEvent {
@@ -15,7 +13,5 @@ public abstract class NexusEvent implements InternalNexusEvent {
     public UUID getUniqueId() {
         return uuid;
     }
-
-    public abstract NexusModuleType getModuleHandle();
 
 }

@@ -1,11 +1,13 @@
 package com.github.polyrocketmatt.nexus.common.manager;
 
+import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
 import com.github.polyrocketmatt.nexus.api.modules.ModuleProcessor;
 import com.github.polyrocketmatt.nexus.api.modules.NexusModule;
 import com.github.polyrocketmatt.nexus.api.modules.NexusModuleType;
 import com.github.polyrocketmatt.nexus.common.exception.NexusModuleException;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -67,6 +69,14 @@ public class ModuleManager implements NexusManager {
 
     public @Nullable NexusModule getModule(NexusModuleType type) {
         return modules.stream().filter(module -> module.getModuleType() == type).findFirst().orElse(null);
+    }
+
+    public <T extends NexusEvent> @NotNull Set<NexusModule> getModulesForEvent(Class<T> event) {
+        Set<NexusModule> modules = new HashSet<>();
+        for (NexusModule module : this.modules)
+            if (module.getObservedEvents().contains(event))
+                modules.add(module);
+        return modules;
     }
 
 }

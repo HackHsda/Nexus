@@ -28,7 +28,10 @@ public class ClientConnectionModule extends NexusModule {
     private final double threatScore = Double.parseDouble(Nexus.getProperties().getProperty("client-connection.weights.threat"));
     private final double thresholdScore = Double.parseDouble(Nexus.getProperties().getProperty("client-connection.weights.threshold"));
 
-
+    @Override
+    public @NotNull Set<Class<?>> getObservedEvents() {
+        return Set.of(PlayerConnectEvent.class);
+    }
 
     @Override
     public @NotNull NexusModuleType getModuleType() {

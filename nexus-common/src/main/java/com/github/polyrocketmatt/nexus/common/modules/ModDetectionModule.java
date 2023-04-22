@@ -127,6 +127,11 @@ public class ModDetectionModule extends NexusModule {
     }
 
     @Override
+    public @NotNull Set<Class<?>> getObservedEvents() {
+        return Set.of(PlayerPacketEvent.class);
+    }
+
+    @Override
     public @NotNull NexusModuleType getModuleType() {
         return NexusModuleType.MOD_DETECTION;
     }
@@ -138,6 +143,7 @@ public class ModDetectionModule extends NexusModule {
         if (!(nexusEntity instanceof NexusPlayer player))
             return new PlainProcessResult(nexusEntity, false);
 
+        System.out.println("Processing mods -> " + event.getMessage());
         Set<String> mods = parseForgeMods(event.getMessage());
 
         return new ModDetectionResult(player, !mods.isEmpty(), mods);

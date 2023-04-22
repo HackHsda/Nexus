@@ -1,7 +1,6 @@
 package com.github.polyrocketmatt.nexus.common.event;
 
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
-import com.github.polyrocketmatt.nexus.api.modules.NexusModuleType;
 
 import java.util.UUID;
 
@@ -14,11 +13,6 @@ public class PlayerPacketEvent extends NexusEvent {
         super(uuid);
         this.channel = channel;
         this.message = message;
-    }
-
-    @Override
-    public NexusModuleType getModuleHandle() {
-        return NexusModuleType.CLIENT_DETECTION;
     }
 
     public String getChannel() {

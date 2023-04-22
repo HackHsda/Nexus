@@ -4,6 +4,7 @@ import com.github.polyrocketmatt.nexus.api.events.ExternalEventListener;
 import com.github.polyrocketmatt.nexus.api.events.InternalEventListener;
 import com.github.polyrocketmatt.nexus.api.events.NexusEvent;
 import com.github.polyrocketmatt.nexus.api.manager.NexusManager;
+import com.github.polyrocketmatt.nexus.api.modules.NexusModule;
 import com.github.polyrocketmatt.nexus.common.Nexus;
 import com.github.polyrocketmatt.nexus.common.exception.NexusProcessingException;
 import com.github.polyrocketmatt.nexus.common.utils.NexusLogger;
@@ -13,6 +14,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 public class EventManager implements NexusManager {
 
@@ -21,6 +23,8 @@ public class EventManager implements NexusManager {
     private final Queue<NexusEvent> eventQueue;
     private final Thread[] workers;
     private final long eventWorkerTimeout;
+    private final int eventParallelism;
+    private final long eventThreadingTimeout;
 
     public EventManager() {
         int workerCount = Integer.parseInt(Nexus.getProperties().getProperty("threading.event-workers"));
@@ -33,6 +37,8 @@ public class EventManager implements NexusManager {
             workers[i].start();
         }
         this.eventWorkerTimeout = Long.parseLong(Nexus.getProperties().getProperty("threading.event-worker-timeout"));
+        this.eventParallelism = Integer.parseInt(Nexus.getProperties().getProperty("threading.event-parallelism"));
+        this.eventThreadingTimeout = Long.parseLong(Nexus.getProperties().getProperty("threading.event-threading-timeout"));
 
         NexusLogger.inform("Initialised %s", NexusLogger.LogType.COMMON, getClass().getSimpleName());
     }
@@ -90,8 +96,11 @@ public class EventManager implements NexusManager {
                     NexusLogger.inform("Worker %s is processing event %s", NexusLogger.LogType.COMMON, Thread.currentThread().getName(), event.getClass().getSimpleName());
 
                     var player = Nexus.getPlayerManager().getPlayer(event.getUniqueId());
-                    var module = Nexus.getModuleManager().getModule(event.getModuleHandle());
-                    if (player == null || module == null || player.getPlayerData() == null) {
+                    var modules = Nexus.getModuleManager().getModulesForEvent(event.getClass());
+                    if (modules.isEmpty())
+                        return;
+
+                    if (player == null || player.getPlayerData() == null) {
                         try {
                             Thread.sleep(eventWorkerTimeout);
 
@@ -108,14 +117,20 @@ public class EventManager implements NexusManager {
                         return;
                     }
 
-                    var handler = module.getModuleHandler(Nexus.getPlatform().getPlatformType());
-                    var result = module.process(player, event);
-                    if (handler != null)
-                        try {
-                            handler.handle(result);
-                        } catch (Exception ex) {
-                            throw new NexusProcessingException("Could not process event %s".formatted(event.getClass().getSimpleName()), ex);
-                        }
+                    ExecutorService service = Nexus.getThreadManager().getService(Math.max(eventParallelism, modules.size()));
+                    for (NexusModule module : modules)
+                        service.submit(() -> {
+                            var handler = module.getModuleHandler(Nexus.getPlatform().getPlatformType());
+                            var result = module.process(player, event);
+                            if (handler != null)
+                                try {
+                                    handler.handle(result);
+                                } catch (Exception ex) {
+                                    throw new NexusProcessingException("Could not process event %s".formatted(event.getClass().getSimpleName()), ex);
+                                }
+                        });
+
+                    Nexus.getThreadManager().handleTermination(service, eventThreadingTimeout);
                 }
             }
         }

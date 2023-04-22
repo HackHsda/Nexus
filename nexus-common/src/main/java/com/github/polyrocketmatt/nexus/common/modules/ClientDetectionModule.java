@@ -51,10 +51,15 @@ public class ClientDetectionModule extends NexusModule {
             String messageCheck = entry.getValue().getSecond();
 
             if (channel.contains(channelCheck) && message.contains(messageCheck))
-                return new Pair<>(false, entry.getKey());
+                return new Pair<>(true, entry.getKey());
         }
 
         return new Pair<>(true, "");
+    }
+
+    @Override
+    public @NotNull Set<Class<?>> getObservedEvents() {
+        return Set.of(PlayerPacketEvent.class);
     }
 
     @Override
@@ -74,6 +79,7 @@ public class ClientDetectionModule extends NexusModule {
         //  Pass the packet information to the client detection module
         Pair<Boolean, String> detectionResult = verify(channel, message);
 
-        return new ClientDetectionResult(player, detectionResult.getFirst(), detectionResult.getSecond());
+        boolean isFailed = detectionResult.getFirst() && !detectionResult.getSecond().isEmpty();
+        return new ClientDetectionResult(player, isFailed, detectionResult.getSecond());
     }
 }
